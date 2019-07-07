@@ -1,3 +1,3 @@
-[example-service.addr]
-ip = "0.0.0.0"
-port = 8123
+[payload-service.addr]
+ip = "127.0.0.1"
+port = 5000
