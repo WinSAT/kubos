@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 import argparse
 import app_api
@@ -7,11 +7,11 @@ import sys
 SERVICES = app_api.Services()
 
 def on_boot(logger):
-    
+
     logger.info("OnBoot logic")
 
 def on_command(logger):
-    
+
     request = '{memInfo{available}}'
 
     try:
@@ -51,9 +51,9 @@ def on_command(logger):
         logger.info("Telemetry insert completed successfully")
 
 def main():
-    
+
     logger = app_api.logging_setup("my-mission-app")
- 
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--run', '-r')
@@ -70,7 +70,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
-
-
