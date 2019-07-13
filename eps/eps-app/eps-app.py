@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
+Main file for communications application that defines communcation between
+satellite and ground station
 """
 
 __author__ = "Jon Grebe"
@@ -18,7 +18,7 @@ def on_boot(logger):
     logger.info("OnBoot logic")
 
 '''
-code to setup/initialize payload subsystem (camera)
+code to setup/initialize eps subsystem
 '''
 
 def on_command(logger):
@@ -26,13 +26,12 @@ def on_command(logger):
     logger.info("OnCommand logic")
 
 '''
-code for sending/receiving commands/images from payload subsystem (camera)
-using defined hardware payload-service
+code for sending/receiving commands/telemetry from eps/battery subsystem
 '''
 
 def main():
 
-    logger = app_api.logging_setup("payload-app")
+    logger = app_api.logging_setup("eps-app")
 
     parser = argparse.ArgumentParser()
 

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
+Main file for adcs application
 """
 
 __author__ = "Jon Grebe"
@@ -18,7 +17,7 @@ def on_boot(logger):
     logger.info("OnBoot logic")
 
 '''
-code to setup/initialize payload subsystem (camera)
+code to setup/initialize adcs subsystem
 '''
 
 def on_command(logger):
@@ -26,13 +25,13 @@ def on_command(logger):
     logger.info("OnCommand logic")
 
 '''
-code for sending/receiving commands/images from payload subsystem (camera)
-using defined hardware payload-service
+code to send commands and receive status/telemtry from attitude determination
+and control
 '''
 
 def main():
 
-    logger = app_api.logging_setup("payload-app")
+    logger = app_api.logging_setup("adcs-app")
 
     parser = argparse.ArgumentParser()
 

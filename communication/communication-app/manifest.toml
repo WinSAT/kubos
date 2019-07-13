@@ -1,0 +1,4 @@
+name = "communications-app"
+executable = "copmmunications-app.py"
+version = "1.0"
+author = "Jon Grebe"

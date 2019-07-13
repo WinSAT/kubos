@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
 
-"""
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
-"""
-
-__author__ = "Jon Grebe"
-__version__ = "0.1.0"
-__license__ = "MIT"
-
 import app_api
 import argparse
 import sys
@@ -17,22 +8,13 @@ def on_boot(logger):
 
     logger.info("OnBoot logic")
 
-'''
-code to setup/initialize payload subsystem (camera)
-'''
-
 def on_command(logger):
 
     logger.info("OnCommand logic")
 
-'''
-code for sending/receiving commands/images from payload subsystem (camera)
-using defined hardware payload-service
-'''
-
 def main():
 
-    logger = app_api.logging_setup("payload-app")
+    logger = app_api.logging_setup("mission-framework")
 
     parser = argparse.ArgumentParser()
 
