@@ -1,14 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
-# Copyright 2018 Kubos Corporation
-# Licensed under the Apache License, Version 2.0
-# See LICENSE file for details
+"""
+
+"""
+
+__author__ = "Jon Grebe"
+__version__ = "0.1.0"
+__license__ = "MIT"
 
 import argparse
 import toml
 
 DEFAULT_IP = "127.0.0.1"
-DEFAULT_PORT = 8001
+DEFAULT_PORT = 5000
 DEFAULT_PATH = "/home/system/etc/config.toml"
 
 

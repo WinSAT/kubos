@@ -10,7 +10,8 @@ __license__ = "MIT"
 
 import graphene
 
-class Adcs(graphene.ObjectType):
+
+class Eps(graphene.ObjectType):
     """
     Model encapsulating subsystem functionality.
     """
@@ -19,19 +20,19 @@ class Adcs(graphene.ObjectType):
 
     def refresh(self):
         """
-        Will hold code for refreshing the status of the subsystem
+        Will hold code for refreshing the status of the eps subsystem
         model based on queries to the actual hardware.
         """
 
-        print("Querying for adcs status")
+        print("Querying for Eps status")
         self.power_on = not self.power_on
 
     def set_power_on(self, power_on):
         """
-        Controls the power state of the adcs subsystem
+        Controls the power state of the eps subsystem
         """
 
-        print("Sending new power state to adcs")
+        print("Sending new power state to eps")
         print("Previous State: {}".format(self.power_on))
         print("New State: {}".format(power_on))
         self.power_on = power_on
@@ -46,4 +47,4 @@ class Status(graphene.ObjectType):
     """
 
     status = graphene.Boolean()
-    subsystem = graphene.Field(Adcs)
+    subsystem = graphene.Field(Eps)

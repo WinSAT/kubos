@@ -1,12 +1,12 @@
-#!/usr/bin/env python
-
-# Copyright 2017 Kubos Corporation
-# Licensed under the Apache License, Version 2.0
-# See LICENSE file for details.
+#!/usr/bin/env python3
 
 """
 Graphene ObjectType classes for subsystem modeling.
 """
+
+__author__ = "Jon Grebe"
+__version__ = "0.1.0"
+__license__ = "MIT"
 
 import graphene
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Main file for communications application that defines communcation between
-satellite and ground station
+Main file for eps application that defines communcation between CDH and eps
+subsystems mainly through clyde space eps module built-in hardware service
 """
 
 __author__ = "Jon Grebe"
@@ -27,6 +27,7 @@ def on_command(logger):
 
 '''
 code for sending/receiving commands/telemetry from eps/battery subsystem
+using built-in clyde space eps module hardware service
 '''
 
 def main():

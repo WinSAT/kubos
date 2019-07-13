@@ -1,12 +1,13 @@
-#!/usr/bin/env python
-
-# Copyright 2017 Kubos Corporation
-# Licensed under the Apache License, Version 2.0
-# See LICENSE file for details.
+#!/usr/bin/env python3
 
 """
-Boilerplate main for service application.
+Boilerplate service code which reads the config file and starts up the
+GraphQL/HTTP endpoint. (should not need to much modification)
 """
+
+__author__ = "Jon Grebe"
+__version__ = "0.1.0"
+__license__ = "MIT"
 
 import logging
 
@@ -15,10 +16,10 @@ from kubos_service.config import Config
 from logging.handlers import SysLogHandler
 import sys
 
-config = Config("payload-service")
+config = Config("adcs-service")
 
 # Setup logging
-logger = logging.getLogger("payload-service")
+logger = logging.getLogger("adcs-service")
 logger.setLevel(logging.DEBUG)
 handler = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_DAEMON)
 formatter = logging.Formatter('payload-service: %(message)s')

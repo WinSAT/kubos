@@ -4,13 +4,10 @@
 Boilerplate Flask setup for service application (should not be modified)
 """
 
-__author__ = "Jon Grebe"
-__version__ = "0.1.0"
-__license__ = "MIT"
-
 from flask import Flask
 from flask_graphql import GraphQLView
 from .schema import schema
+
 
 def create_app():
     """

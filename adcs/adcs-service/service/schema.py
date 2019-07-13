@@ -1,19 +1,19 @@
-#!/usr/bin/env python
-
-# Copyright 2017 Kubos Corporation
-# Licensed under the Apache License, Version 2.0
-# See LICENSE file for details.
+#!/usr/bin/env python3
 
 """
 Graphene schema setup to enable queries.
 """
 
+__author__ = "Jon Grebe"
+__version__ = "0.1.0"
+__license__ = "MIT"
+
 import graphene
-from .models import Status, Payload
+from .models import Status, Adcs
 
 # Local subsystem instance for tracking state
 # May not be neccesary when tied into actual hardware
-_payload = Payload(power_on=False)
+_adcs = Adcs(power_on=False)
 
 
 class Query(graphene.ObjectType):
@@ -21,20 +21,20 @@ class Query(graphene.ObjectType):
     Creates query endpoints exposed by graphene.
     """
 
-    payload = graphene.Field(Payload)
+    adcs = graphene.Field(Adcs)
 
-    def resolve_payload(self, info):
+    def resolve_adcs(self, info):
         """
-        Handles request for subsystem query.
+        Handles request for adcs subsystem query.
         """
 
-        _payload.refresh()
-        return _payload
+        _adcs.refresh()
+        return _adcs
 
 
 class PowerOn(graphene.Mutation):
     """
-    Creates mutation for Payload.PowerOn
+    Creates mutation for Adcs.PowerOn
     """
 
     class Arguments:
@@ -44,12 +44,12 @@ class PowerOn(graphene.Mutation):
 
     def mutate(self, info, power):
         """
-        Handles request for payload powerOn mutation
+        Handles request for adcs powerOn mutation
         """
 
-        status = Status(status=True, subsystem=_payload)
+        status = Status(status=True, subsystem=_adcs)
         if power is not None:
-            status = _payload.set_power_on(power)
+            status = _adcs.set_power_on(power)
 
         return status
 
@@ -63,3 +63,48 @@ class Mutation(graphene.ObjectType):
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
+'''
+type Query {
+    mode(): String
+    orientation(): [Float]
+    spin(): [Float]
+}
+
+type Mutation {
+    setMode(
+        input: SetModeInput!
+    ): SetModePayload
+    update(
+        input: UpdateInput
+    ): UpdatePayload
+}
+
+type SetModePayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+}
+
+input SetModeInput {
+    mode: String
+    configuration: ModeConfiguration
+}
+
+# Whatever is needed for the ADCS to enter a mode
+type ModeConfiguration {
+    parameter1: Float
+    # parameter2: any type
+    # parameter3: any type
+    # ...
+}
+
+type UpdatePayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+}
+
+input UpdateInput {
+    time: Float
+    gpsLock: [Float]
+    # whatever else needs to be updated for the unit to function properly
+}
+'''

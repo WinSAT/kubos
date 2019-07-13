@@ -17,8 +17,6 @@ import argparse
 import app_api
 import sys
 
-SERVICES = app_api.Services()
-
 def on_boot(logger):
 
     logger.info("OnBoot logic")

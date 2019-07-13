@@ -1,1 +1,2 @@
-Python subsystem service for satellite payload or camera
+Payload hardware service for sending and receiving commands and images
+from the payload subsystem (camera)

@@ -1,16 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
+# Copyright 2017 Kubos Corporation
+# Licensed under the Apache License, Version 2.0
+# See LICENSE file for details.
 
 """
 Graphene ObjectType classes for subsystem modeling.
 """
 
-__author__ = "Jon Grebe"
-__version__ = "0.1.0"
-__license__ = "MIT"
-
 import graphene
 
-class Adcs(graphene.ObjectType):
+
+class Payload(graphene.ObjectType):
     """
     Model encapsulating subsystem functionality.
     """
@@ -23,15 +24,15 @@ class Adcs(graphene.ObjectType):
         model based on queries to the actual hardware.
         """
 
-        print("Querying for adcs status")
+        print("Querying for payload status")
         self.power_on = not self.power_on
 
     def set_power_on(self, power_on):
         """
-        Controls the power state of the adcs subsystem
+        Controls the power state of the payload
         """
 
-        print("Sending new power state to adcs")
+        print("Sending new power state to payload")
         print("Previous State: {}".format(self.power_on))
         print("New State: {}".format(power_on))
         self.power_on = power_on
@@ -46,4 +47,4 @@ class Status(graphene.ObjectType):
     """
 
     status = graphene.Boolean()
-    subsystem = graphene.Field(Adcs)
+    subsystem = graphene.Field(Payload)

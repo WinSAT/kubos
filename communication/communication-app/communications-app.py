@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+Main file for communications application that defines communcation between
+satellite and ground station
+"""
+
+__author__ = "Jon Grebe"
+__version__ = "0.1.0"
+__license__ = "MIT"
+
 import app_api
 import argparse
 import sys
@@ -8,13 +17,22 @@ def on_boot(logger):
 
     logger.info("OnBoot logic")
 
+'''
+code to setup/initialize communications subsystem
+'''
+
 def on_command(logger):
 
     logger.info("OnCommand logic")
 
+'''
+code for sending/receiving commands/data from ground station by using built-in
+communcations service
+'''
+
 def main():
 
-    logger = app_api.logging_setup("mission-framework")
+    logger = app_api.logging_setup("communcations-app")
 
     parser = argparse.ArgumentParser()
 
