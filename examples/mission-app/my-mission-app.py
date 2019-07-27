@@ -12,7 +12,7 @@ def on_boot(logger):
 
 def on_command(logger):
 
-    request = '{memInfo{available}}'
+    request = '{ ping }'
 
     try:
         response = SERVICES.query(service="monitor-service", query=request)

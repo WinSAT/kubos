@@ -9,13 +9,13 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
-
+import Adafruit_BBIO.UART as UART
+import serial
 
 class Payload(graphene.ObjectType):
     """
     Model encapsulating subsystem functionality.
     """
-
     power_on = graphene.Boolean()
 
     def refresh(self):
@@ -38,6 +38,30 @@ class Payload(graphene.ObjectType):
         self.power_on = power_on
         return Status(status=True, subsystem=self)
 
+    def send_message(self, message):
+        print("Sending message to the pi: " + str(message))
+        try:
+            UART.setup("UART1")
+            ser = serial.Serial(
+                port = '/dev/tty01',
+                baudrate = 9600,
+                parity = serial.PARITY_NONE,
+                stopbits = serial.STOPBITS_ONE,
+                bytesize = serial.EIGHTBITS,
+                timeout = 1)
+            ser.close()
+            ser.open()
+            if ser.isOpen():
+                print("Serial is open. Sending message to the pi.")
+                ser.write(message);
+                ser.close()
+                return Status(status=True, subsystem=self)
+            else:
+                ser.close()
+                return Status(status=False, subsystem=self)
+        except Exception as e:
+            print("Error sending message to pi: " + str(e))
+            return Status(status=False, subsystem=self)
 
 class Status(graphene.ObjectType):
     """

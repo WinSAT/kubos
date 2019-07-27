@@ -15,7 +15,7 @@ import sys
 
 def on_boot(logger):
 
-    logger.info("OnBoot logic")
+    print("OnBoot logic")
 
 '''
 code to setup/initialize payload subsystem (camera)
@@ -23,7 +23,26 @@ code to setup/initialize payload subsystem (camera)
 
 def on_command(logger):
 
-    logger.info("OnCommand logic")
+    print("OnCommand logic")
+    print("Sending message 'hello' to pi...", end="")
+
+    request = '''
+        mutation {
+            message(message:"hello") {
+                status
+            }
+        }
+        '''
+
+    response = SERVICES.query(service="payload-service", query=request)
+
+    data = response["message"]
+    status = data["status"]
+
+    if status == False:
+        print("Message send failed")
+    else:
+        print("Message send succeeded")
 
 '''
 code for sending/receiving commands/images from payload subsystem (camera)

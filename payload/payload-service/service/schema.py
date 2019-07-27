@@ -9,12 +9,12 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
+
 from .models import Status, Payload
 
 # Local subsystem instance for tracking state
 # May not be neccesary when tied into actual hardware
 _payload = Payload(power_on=False)
-
 
 class Query(graphene.ObjectType):
     """
@@ -53,12 +53,22 @@ class PowerOn(graphene.Mutation):
 
         return status
 
+class Message(graphene.Mutation):
+    class Arguments:
+        message = graphene.String()
+
+    Output = Status
+
+    def mutate(self, info, message):
+        # Handles say hello request and sends hello message to pi
+        status = _payload.send_message(message)
+        return status
 
 class Mutation(graphene.ObjectType):
     """
     Creates mutation endpoints exposed by graphene.
     """
-
+    message = Message.Field()
     power_on = PowerOn.Field()
 
 
