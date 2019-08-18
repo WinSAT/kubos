@@ -9,7 +9,7 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
-import Adafruit_BBIO.UART as UART
+#import Adafruit_BBIO.UART as UART
 import serial
 
 class Payload(graphene.ObjectType):
@@ -41,9 +41,9 @@ class Payload(graphene.ObjectType):
     def send_message(self, message):
         print("Sending message to the pi: " + str(message))
         try:
-            UART.setup("UART1")
+            #UART.setup("UART1")
             ser = serial.Serial(
-                port = '/dev/tty01',
+                port = '/dev/ttyS1',
                 baudrate = 9600,
                 parity = serial.PARITY_NONE,
                 stopbits = serial.STOPBITS_ONE,
@@ -53,7 +53,7 @@ class Payload(graphene.ObjectType):
             ser.open()
             if ser.isOpen():
                 print("Serial is open. Sending message to the pi.")
-                ser.write(message);
+                ser.write(str.encode(message));
                 ser.close()
                 return Status(status=True, subsystem=self)
             else:
