@@ -67,13 +67,13 @@ def main():
     else:
         SERVICES = app_api.Services()
 
-    if args.run[0] == 'OnBoot':
-        on_boot(logger)
-    elif args.run[0] == 'OnCommand':
-        on_command(logger)
+    if args.run is not None:
+        if args.run[0] == 'OnBoot':
+            on_boot(logger)
+        elif args.run[0] == 'OnCommand':
+            on_command(logger)
     else:
-        logger.error("Unknown run level specified")
-        sys.exit(1)
-
+        on_command(logger)
+        
 if __name__ == "__main__":
     main()

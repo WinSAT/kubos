@@ -1,42 +1,37 @@
 #!/usr/bin/env python3
 
-"""
-Graphene schema setup to enable queries.
-"""
-
 __author__ = "Jon Grebe"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
-
 from .models import Status, Payload
 
 # Local subsystem instance for tracking state
 # May not be neccesary when tied into actual hardware
 _payload = Payload(power_on=False)
 
+'''
+type Query {
+    ack(): String
+    power(): PowerState
+    config(): String
+    errors(): [String] # Error descriptions if there are any, or empty if there aren't
+    telemetry(): Telemetry
+    testResults(): TestResults
+}
+'''
 class Query(graphene.ObjectType):
-    """
-    Creates query endpoints exposed by graphene.
-    """
-
     payload = graphene.Field(Payload)
+    
 
     def resolve_payload(self, info):
-        """
-        Handles request for subsystem query.
-        """
 
         _payload.refresh()
         return _payload
 
 
 class PowerOn(graphene.Mutation):
-    """
-    Creates mutation for Payload.PowerOn
-    """
-
     class Arguments:
         power = graphene.Boolean()
 
@@ -53,6 +48,13 @@ class PowerOn(graphene.Mutation):
 
         return status
 
+'''
+mutation {
+    message(message:"hello") {
+        status
+    }
+}
+'''
 class Message(graphene.Mutation):
     class Arguments:
         message = graphene.String()
@@ -64,10 +66,194 @@ class Message(graphene.Mutation):
         status = _payload.send_message(message)
         return status
 
+'''
+# Result of an attemped mutation
+interface MutationResult {
+    errors: [String]
+    success: Boolean
+}
+'''
+class MutationResult(graphene.Interface):
+    errors = graphene.List(lambda: String)
+    success = graphene.Boolean()
+
+'''
+# Simply confirms that the unit is present and talking
+type NoopPayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+}
+'''
+class NoopPayload(graphene.ObjectType):
+    class Meta:
+        interfaces = (MutationResult, )
+
+
+class Noop():
+    class Arguments:
+
+    Output = Status
+
+    #def mutate(self, info):
+
+'''
+type ControlPowerPayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+    power: PowerState
+}
+'''
+class ControlPowerPayload(graphene.ObjectType):
+    class Meta:
+        interfaces = (MutationResult, )
+
+    power = graphene.Field(PowerState)
+
+'''
+enum PowerStateEnum {
+    ON
+    OFF
+    RESET
+}
+'''
+class PowerStateEnum(graphene.Enum):
+    ON = 1
+    OFF = 2
+    RESET = 3
+
+'''
+input ControlPowerInput {
+    state: PowerStateEnum!
+}
+'''
+class ControlPowerInput(graphene.InputObjectType):
+    state = graphene.Field(PowerStateEnum)
+
+class controlPower():
+    class Arguments:
+
+    Output = Status
+
+    #def mutate(self, info):
+
+'''
+type ConfigureHardwarePayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+    config: String
+}
+'''
+class ConfigureHardwarePayload(graphene.ObjectType):
+    class Meta:
+        interfaces = (MutationResult, )
+
+    config = graphene.String()
+
+'''
+input ConfigureHardwareInput {
+    config: String
+}
+'''
+class ConfigureHardwareInput(graphene.InputObjectType):
+    config = graphene.String()
+
+class configureHardware():
+    class Arguments:
+
+    Output = Status
+
+    #def mutate(self, info):
+
+'''
+# Hardware testing has 2 levels:
+# INTEGRATION is to test the FSW's compatibility with the unit
+# HARDWARE is to test that the hardware itself is functioning
+type TestHardwarePayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+    results: TestResults
+}
+'''
+class TestHardwarePayload(graphene.ObjectType):
+    class Meta:
+        interfaces = (MutationResult, )
+
+    results = graphene.Field(TestResults)
+
+'''
+input TestHardwareInput {
+    testType: TestType
+}
+'''
+class TestHardwareInput(graphene.InputObjectType):
+    testType = graphene.Field(TestType)
+
+'''
+enum TestTypeEnum {
+    INTEGRATION
+    HARDWARE
+    # Add other types as needed
+}
+'''
+class TestTypeEnum(graphene.Enum):
+    INTEGRATION = 1
+    HARDWARE = 2
+
+class testHardware():
+    class Arguments:
+
+    Output = Status
+
+    #def mutate(self, info):
+
+'''
+type IssueRawCommandPayload implements MutationResult {
+    errors: [String]
+    success: Boolean
+    ack: String
+}
+'''
+class IssueRawCommandPayload(graphene.ObjectType):
+    class Meta:
+        interfaces = (MutationResult, )
+
+    ack = graphene.String()
+
+'''
+input IssueRawCommandInput {
+    # Input for this is really whatever it needs to be for the specific unit, and can be changed accordingly
+    command: String
+}
+'''
+class IssueRawCommandInput(graphene.InputObjectType):
+    command = graphene.String()
+
+
+class issueRawCommand():
+    class Arguments:
+
+    Output = Status
+
+    #def mutate(self, info):
+
+'''
+type Mutation {
+    noop(): NoopPayload
+    controlPower(
+        input: ControlPowerInput!
+    ): ControlPowerPayload
+    configureHardware(
+        input: ConfigureHardwareInput!
+    ): ConfigureHardwarePayload
+    testHardware(
+        input: TestHardwareInput!
+    ): TestHardwarePayload
+    issueRawCommand(
+        input: IssueRawCommandInput!
+    ): IssueRawCommandPayload
+}
+'''
 class Mutation(graphene.ObjectType):
-    """
-    Creates mutation endpoints exposed by graphene.
-    """
     message = Message.Field()
     power_on = PowerOn.Field()
 
@@ -75,14 +261,21 @@ class Mutation(graphene.ObjectType):
 schema = graphene.Schema(query=Query, mutation=Mutation)
 
 '''
-type Query {
-    ack(): String
-    power(): PowerState
-    config(): String
-    errors(): [String] # Error descriptions if there are any, or empty if there aren't
-    telemetry(): Telemetry
-    testResults(): TestResults
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 type PowerState {
     state: PowerStateEnum
@@ -121,87 +314,4 @@ type TestResults {
     # ...
 }
 
-type Mutation {
-    noop(): NoopPayload
-    controlPower(
-        input: ControlPowerInput!
-    ): ControlPowerPayload
-    configureHardware(
-        input: ConfigureHardwareInput!
-    ): ConfigureHardwarePayload
-    testHardware(
-        input: TestHardwareInput!
-    ): TestHardwarePayload
-    issueRawCommand(
-        input: IssueRawCommandInput!
-    ): IssueRawCommandPayload
-}
-
-# Result of an attemped mutation
-interface MutationResult {
-    errors: [String]
-    success: Boolean
-}
-
-# Simply confirms that the unit is present and talking
-type NoopPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-}
-
-type ControlPowerPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    power: PowerState
-}
-
-input ControlPowerInput {
-    state: PowerStateEnum!
-}
-
-enum PowerStateEnum {
-    ON
-    OFF
-    RESET
-}
-
-type ConfigureHardwarePayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    config: String
-}
-
-input ConfigureHardwareInput {
-    config: String
-}
-
-# Hardware testing has 2 levels:
-# INTEGRATION is to test the FSW's compatibility with the unit
-# HARDWARE is to test that the hardware itself is functioning
-type TestHardwarePayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    results: TestResults
-}
-
-input TestHardwareInput {
-    testType: TestType
-}
-
-enum TestTypeEnum {
-    INTEGRATION
-    HARDWARE
-    # Add other types as needed
-}
-
-type IssueRawCommandPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    ack: String
-}
-
-input IssueRawCommandInput {
-    # Input for this is really whatever it needs to be for the specific unit, and can be changed accordingly
-    command: String
-}
 '''
