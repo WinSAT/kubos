@@ -22,239 +22,184 @@ type Query {
 }
 '''
 class Query(graphene.ObjectType):
-    payload = graphene.Field(Payload)
 
-    #def resolve_payload(self, info):
-    #    _payload.refresh()
-    #    return _payload
-
-    #ping = graphene.String()
-    #power = graphene.Field(PowerState)
-    #config = graphene.String()
-    #errors = graphene.List(lambda: String)
-    #telemetry = graphene.Field(Telemetry)
-    #testResults = graphene.Field(TestResults)
-
+    '''
+    query {
+        ping
+    }
+    '''
+    ping = graphene.String()
     def resolve_ping(self, info):
         return _payload.ping()
 
+    '''
+    query {
+        ping
+    }
+    '''
+    ack = graphene.String()
+    def resolve_ack(self, info):
+        return _payload.ack()
+
+    '''
+    query {
+        power { state }
+    }
+    '''
+    power = graphene.Field(PowerState)
     def resolve_power(self, info):
-        power = Payload.objects.get()
+        return _payload.power()
 
-    #def resolve_config(self, info):
-    #def resolve_errors(self, info):
-    #def resolve_telemetry(self, info):
-    #def resolve_testResults(self, info):
+    '''
+    query {
+        config
+    }
+    '''
+    config = graphene.String()
+    def resolve_config(self, info):
+        return _payload.config()
 
-
-################## MUTATIONS #################
-'''
-mutation {
-    noop {
-        success
+    '''
+    query {
         errors
     }
-}
-        '''
+    '''
+    errors = graphene.List(graphene.String)
+    def resolve_errors(self, info):
+        return _payload.errors()
+
+    '''
+    query {
+        telemetry {
+            nominal { field1nominal field2nominal }
+            debug { field1debug field2debug }
+            }
+    }
+    '''
+    telemetry = graphene.Field(Telemetry)
+    def resolve_telemetry(self, info):
+        return _payload.telemetry()
+
+    '''
+    query {
+    testResults {
+     telemetryNominal { field1nominal field2nominal }
+     telemetryDebug { field1debug field2debug }
+     success
+     results1
+     results2
+    }
+    }
+    '''
+    testResults = graphene.Field(TestResults)
+    def resolve_testResults(self, info):
+        return _payload.testResults()
+
+################## MUTATIONS #################
 class Noop(graphene.Mutation):
-    Output = Result
+    Output = MutationResult
     def mutate(self, info):
         return _payload.noop()
 
 '''
 mutation {
- controlPower(controlPowerInput: {state: ON}) {
-    result { success errors }
-    power
+    controlPower(controlPowerInput: {state: OFF}) {
+        success
+        errors
+        power { state }
+        }
     }
-}
-    '''
-class ControlPowerInput(graphene.InputObjectType):
-    state = graphene.Field(PowerStateEnum)
-
+'''
 class ControlPower(graphene.Mutation):
     class Arguments:
         controlPowerInput = ControlPowerInput()
 
     Output = ControlPowerPayload
-
     def mutate(self, info, controlPowerInput):
         return _payload.controlPower(controlPowerInput)
 
-
 '''
-type ConfigureHardwarePayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    config: String
+mutation {
+     configureHardware(configureHardwareInput: {config: "test"}) {
+        success
+        errors
+        config
+    }
 }
 '''
-#class ConfigureHardwarePayload(graphene.ObjectType):
-#    class Meta:
-#        interfaces = (MutationResult, )
-#
-#    config = graphene.String()
+class ConfigureHardware(graphene.Mutation):
+    class Arguments:
+        configureHardwareInput = ConfigureHardwareInput()
 
-'''
-input ConfigureHardwareInput {
-    config: String
-}
-'''
-#class ConfigureHardwareInput(graphene.InputObjectType):
-#    config = graphene.String()
+    Output = ConfigureHardwarePayload
+    def mutate(self, info, configureHardwareInput):
+        return _payload.configureHardware(configureHardwareInput)
 
-#class configureHardware():
-#    class Arguments:
-
-#    Output = Status
-
-    #def mutate(self, info):
-
-'''
 # Hardware testing has 2 levels:
 # INTEGRATION is to test the FSW's compatibility with the unit
 # HARDWARE is to test that the hardware itself is functioning
-type TestHardwarePayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    results: TestResults
+'''
+mutation {
+ testHardware(testHardwareInput: {testType: HARDWARE}) {
+    success
+    errors
+    results {
+    success
+    telemetryNominal { field1nominal field2nominal }
+    telemetryDebug { field1debug field2debug }
+    results1
+    results2
+    }
+}
 }
 '''
-#class TestHardwarePayload(graphene.ObjectType):
-#    class Meta:
-#        interfaces = (MutationResult, )
+class TestHardware(graphene.Mutation):
+    class Arguments:
+        testHardwareInput = TestHardwareInput()
 
-#    results = graphene.Field(TestResults)
+    Output = TestHardwarePayload
+    def mutate(self, info, testHardwareInput):
+        return _payload.testHardware(testHardwareInput)
 
 '''
-input TestHardwareInput {
-    testType: TestType
+mutation {
+     issueRawCommand(issueRawCommandInput: {command: "go"}) {
+        success
+        errors
+        ack
+    }
 }
 '''
-#class TestHardwareInput(graphene.InputObjectType):
-#    testType = graphene.Field(TestType)
+class IssueRawCommand(graphene.Mutation):
+    class Arguments:
+        issueRawCommandInput = IssueRawCommandInput()
 
-'''
-enum TestTypeEnum {
-    INTEGRATION
-    HARDWARE
-    # Add other types as needed
-}
-'''
-#class TestTypeEnum(graphene.Enum):
-#    INTEGRATION = 1
-#    HARDWARE = 2
-
-#class testHardware():
-#    class Arguments:
-
-#    Output = Status
-
-    #def mutate(self, info):
-
-'''
-type IssueRawCommandPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    ack: String
-}
-'''
-#class IssueRawCommandPayload(graphene.ObjectType):
-#    class Meta:
-#        interfaces = (MutationResult, )
-
-#    ack = graphene.String()
-
-'''
-input IssueRawCommandInput {
-    # Input for this is really whatever it needs to be for the specific unit, and can be changed accordingly
-    command: String
-}
-'''
-#class IssueRawCommandInput(graphene.InputObjectType):
-#    command = graphene.String()
-
-
-#class issueRawCommand():
-#    class Arguments:
-
-#    Output = Status
-
-    #def mutate(self, info):
+    Output = IssueRawCommandPayload
+    def mutate(self, info, issueRawCommandInput):
+        return _payload.issueRawCommand(issueRawCommandInput)
 
 '''
 type Mutation {
-    noop(): NoopPayload
+    noop(): Noop
     controlPower(
         input: ControlPowerInput!
-    ): ControlPowerPayload
+    ): ControlPower
     configureHardware(
         input: ConfigureHardwareInput!
-    ): ConfigureHardwarePayload
+    ): ConfigureHardware
     testHardware(
         input: TestHardwareInput!
-    ): TestHardwarePayload
+    ): TestHardware
     issueRawCommand(
         input: IssueRawCommandInput!
-    ): IssueRawCommandPayload
+    ): IssueRawCommand
 }
 '''
 class Mutation(graphene.ObjectType):
-    #message = Message.Field()
-    #power_on = PowerOn.Field()
     noop = Noop.Field()
     controlPower = ControlPower.Field()
-
+    configureHardware = ConfigureHardware.Field()
+    testHardware = TestHardware.Field()
+    issueRawCommand = IssueRawCommand.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-type Telemetry {
-    nominal: TelemetryNominal
-    debug: TelemetryDebug
-}
-
-type TelemetryNominal {
-    # Telemetry items that are required to know the general status of the hardware
-    field1: Float
-    # field2: whatever type
-    # field3: whatever type
-    # ...
-}
-
-type TelemetryDebug {
-    # Telemetry items that are only useful if actively debugging/diagnosing the system
-    field1: Float
-    # field2: whatever type
-    # field3: whatever type
-    # ...
-}
-
-type TestResults {
-    # Results of last test performed. success, telemetryNominal, and telemetryDebug are always present
-    # Additional results can be added as indicated
-    success: Boolean
-    telemetryNominal: TelemetryNominal
-    telemetryDebug: TelemetryDebug
-    # results1: any type
-    # results2: any type
-    # ...
-}
-
-'''

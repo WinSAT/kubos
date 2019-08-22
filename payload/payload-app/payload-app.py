@@ -27,14 +27,16 @@ def on_command(logger):
     print("Sending message 'hello' to pi...", end="")
 
     request = '''
-mutation {
-     controlPower(controlPowerInput: {state: OFF}) {
-        result { success errors }
-        power { state }
+query {
+    testResults {
+     telemetryNominal { field1nominal field2nominal }
+     telemetryDebug { field1debug field2debug }
+     success
+     results1
+     results2
     }
 }
-        '''
-
+    '''
     response = SERVICES.query(service="payload-service", query=request)
     print(response)
 
