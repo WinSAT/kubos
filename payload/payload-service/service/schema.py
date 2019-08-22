@@ -5,15 +5,15 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
-from .models import Status, Payload
+from .models import *
 
 # Local subsystem instance for tracking state
 # May not be neccesary when tied into actual hardware
-_payload = Payload(power_on=False)
+_payload = Payload()
 
 '''
 type Query {
-    ack(): String
+    ping(): String
     power(): PowerState
     config(): String
     errors(): [String] # Error descriptions if there are any, or empty if there aren't
@@ -23,118 +23,64 @@ type Query {
 '''
 class Query(graphene.ObjectType):
     payload = graphene.Field(Payload)
-    
 
-    def resolve_payload(self, info):
+    #def resolve_payload(self, info):
+    #    _payload.refresh()
+    #    return _payload
 
-        _payload.refresh()
-        return _payload
+    #ping = graphene.String()
+    #power = graphene.Field(PowerState)
+    #config = graphene.String()
+    #errors = graphene.List(lambda: String)
+    #telemetry = graphene.Field(Telemetry)
+    #testResults = graphene.Field(TestResults)
+
+    def resolve_ping(self, info):
+        return _payload.ping()
+
+    def resolve_power(self, info):
+        power = Payload.objects.get()
+
+    #def resolve_config(self, info):
+    #def resolve_errors(self, info):
+    #def resolve_telemetry(self, info):
+    #def resolve_testResults(self, info):
 
 
-class PowerOn(graphene.Mutation):
-    class Arguments:
-        power = graphene.Boolean()
-
-    Output = Status
-
-    def mutate(self, info, power):
-        """
-        Handles request for payload powerOn mutation
-        """
-
-        status = Status(status=True, subsystem=_payload)
-        if power is not None:
-            status = _payload.set_power_on(power)
-
-        return status
+################## MUTATIONS #################
+'''
+mutation {
+    noop {
+        success
+        errors
+    }
+}
+        '''
+class Noop(graphene.Mutation):
+    Output = Result
+    def mutate(self, info):
+        return _payload.noop()
 
 '''
 mutation {
-    message(message:"hello") {
-        status
+ controlPower(controlPowerInput: {state: ON}) {
+    result { success errors }
+    power
     }
 }
-'''
-class Message(graphene.Mutation):
-    class Arguments:
-        message = graphene.String()
-
-    Output = Status
-
-    def mutate(self, info, message):
-        # Handles say hello request and sends hello message to pi
-        status = _payload.send_message(message)
-        return status
-
-'''
-# Result of an attemped mutation
-interface MutationResult {
-    errors: [String]
-    success: Boolean
-}
-'''
-class MutationResult(graphene.Interface):
-    errors = graphene.List(lambda: String)
-    success = graphene.Boolean()
-
-'''
-# Simply confirms that the unit is present and talking
-type NoopPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-}
-'''
-class NoopPayload(graphene.ObjectType):
-    class Meta:
-        interfaces = (MutationResult, )
-
-
-class Noop():
-    class Arguments:
-
-    Output = Status
-
-    #def mutate(self, info):
-
-'''
-type ControlPowerPayload implements MutationResult {
-    errors: [String]
-    success: Boolean
-    power: PowerState
-}
-'''
-class ControlPowerPayload(graphene.ObjectType):
-    class Meta:
-        interfaces = (MutationResult, )
-
-    power = graphene.Field(PowerState)
-
-'''
-enum PowerStateEnum {
-    ON
-    OFF
-    RESET
-}
-'''
-class PowerStateEnum(graphene.Enum):
-    ON = 1
-    OFF = 2
-    RESET = 3
-
-'''
-input ControlPowerInput {
-    state: PowerStateEnum!
-}
-'''
+    '''
 class ControlPowerInput(graphene.InputObjectType):
     state = graphene.Field(PowerStateEnum)
 
-class controlPower():
+class ControlPower(graphene.Mutation):
     class Arguments:
+        controlPowerInput = ControlPowerInput()
 
-    Output = Status
+    Output = ControlPowerPayload
 
-    #def mutate(self, info):
+    def mutate(self, info, controlPowerInput):
+        return _payload.controlPower(controlPowerInput)
+
 
 '''
 type ConfigureHardwarePayload implements MutationResult {
@@ -143,24 +89,24 @@ type ConfigureHardwarePayload implements MutationResult {
     config: String
 }
 '''
-class ConfigureHardwarePayload(graphene.ObjectType):
-    class Meta:
-        interfaces = (MutationResult, )
-
-    config = graphene.String()
+#class ConfigureHardwarePayload(graphene.ObjectType):
+#    class Meta:
+#        interfaces = (MutationResult, )
+#
+#    config = graphene.String()
 
 '''
 input ConfigureHardwareInput {
     config: String
 }
 '''
-class ConfigureHardwareInput(graphene.InputObjectType):
-    config = graphene.String()
+#class ConfigureHardwareInput(graphene.InputObjectType):
+#    config = graphene.String()
 
-class configureHardware():
-    class Arguments:
+#class configureHardware():
+#    class Arguments:
 
-    Output = Status
+#    Output = Status
 
     #def mutate(self, info):
 
@@ -174,19 +120,19 @@ type TestHardwarePayload implements MutationResult {
     results: TestResults
 }
 '''
-class TestHardwarePayload(graphene.ObjectType):
-    class Meta:
-        interfaces = (MutationResult, )
+#class TestHardwarePayload(graphene.ObjectType):
+#    class Meta:
+#        interfaces = (MutationResult, )
 
-    results = graphene.Field(TestResults)
+#    results = graphene.Field(TestResults)
 
 '''
 input TestHardwareInput {
     testType: TestType
 }
 '''
-class TestHardwareInput(graphene.InputObjectType):
-    testType = graphene.Field(TestType)
+#class TestHardwareInput(graphene.InputObjectType):
+#    testType = graphene.Field(TestType)
 
 '''
 enum TestTypeEnum {
@@ -195,14 +141,14 @@ enum TestTypeEnum {
     # Add other types as needed
 }
 '''
-class TestTypeEnum(graphene.Enum):
-    INTEGRATION = 1
-    HARDWARE = 2
+#class TestTypeEnum(graphene.Enum):
+#    INTEGRATION = 1
+#    HARDWARE = 2
 
-class testHardware():
-    class Arguments:
+#class testHardware():
+#    class Arguments:
 
-    Output = Status
+#    Output = Status
 
     #def mutate(self, info):
 
@@ -213,11 +159,11 @@ type IssueRawCommandPayload implements MutationResult {
     ack: String
 }
 '''
-class IssueRawCommandPayload(graphene.ObjectType):
-    class Meta:
-        interfaces = (MutationResult, )
+#class IssueRawCommandPayload(graphene.ObjectType):
+#    class Meta:
+#        interfaces = (MutationResult, )
 
-    ack = graphene.String()
+#    ack = graphene.String()
 
 '''
 input IssueRawCommandInput {
@@ -225,14 +171,14 @@ input IssueRawCommandInput {
     command: String
 }
 '''
-class IssueRawCommandInput(graphene.InputObjectType):
-    command = graphene.String()
+#class IssueRawCommandInput(graphene.InputObjectType):
+#    command = graphene.String()
 
 
-class issueRawCommand():
-    class Arguments:
+#class issueRawCommand():
+#    class Arguments:
 
-    Output = Status
+#    Output = Status
 
     #def mutate(self, info):
 
@@ -254,34 +200,31 @@ type Mutation {
 }
 '''
 class Mutation(graphene.ObjectType):
-    message = Message.Field()
-    power_on = PowerOn.Field()
+    #message = Message.Field()
+    #power_on = PowerOn.Field()
+    noop = Noop.Field()
+    controlPower = ControlPower.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-type PowerState {
-    state: PowerStateEnum
-    uptime: Int
-}
-
 type Telemetry {
     nominal: TelemetryNominal
     debug: TelemetryDebug

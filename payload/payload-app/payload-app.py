@@ -27,22 +27,16 @@ def on_command(logger):
     print("Sending message 'hello' to pi...", end="")
 
     request = '''
-        mutation {
-            message(message:"hello") {
-                status
-            }
-        }
+mutation {
+     controlPower(controlPowerInput: {state: OFF}) {
+        result { success errors }
+        power { state }
+    }
+}
         '''
 
     response = SERVICES.query(service="payload-service", query=request)
-
-    data = response["message"]
-    status = data["status"]
-
-    if status == False:
-        print("Message send failed")
-    else:
-        print("Message send succeeded")
+    print(response)
 
 '''
 code for sending/receiving commands/images from payload subsystem (camera)
@@ -74,6 +68,6 @@ def main():
             on_command(logger)
     else:
         on_command(logger)
-        
+
 if __name__ == "__main__":
     main()

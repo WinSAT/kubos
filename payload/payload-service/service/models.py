@@ -9,14 +9,60 @@ __version__ = "0.1.0"
 __license__ = "MIT"
 
 import graphene
-#import Adafruit_BBIO.UART as UART
 import serial
 
+'''
+enum PowerStateEnum {
+    ON
+    OFF
+    RESET
+}
+'''
+class PowerStateEnum(graphene.Enum):
+    OFF = 0
+    ON = 1
+    RESET = 2
+
+class PowerState(graphene.ObjectType):
+    state = graphene.Field(PowerStateEnum)
+
+class Result(graphene.ObjectType):
+    errors = graphene.List(graphene.String)
+    success = graphene.Boolean()
+
+class ControlPowerPayload(graphene.ObjectType):
+    result = graphene.Field(Result)
+    power = graphene.Field(PowerState)
+
 class Payload(graphene.ObjectType):
-    """
-    Model encapsulating subsystem functionality.
-    """
-    power_on = graphene.Boolean()
+    power = graphene.Field(PowerState, default_value=PowerState(state=PowerStateEnum(0)))
+    config = graphene.String()
+    errors = graphene.List(graphene.String)
+    #telemetry = graphene.Field(Telemetry)
+    #testResults = graphene.Field(TestResults)
+
+################ mutations #################
+    # send a command and if get appropirate response:
+    def noop(self):
+        return Result(success=True, errors=[])
+
+    # Controls the power state of the payload
+    def controlPower(self, controlPowerInput):
+        print("Sending new power state to payload")
+        print("Previous State: {}".format(self.power.state.name))
+
+        # change power state of payload here
+
+        # if successful
+        self.power = PowerState(state=controlPowerInput.state)
+        self.result = Result(errors=[],success=True)
+        #print("New State: {}".format())
+        return ControlPowerPayload(result=self.result,power=self.power)
+        #return True
+
+################ queries ###################
+    def ping():
+        return "pong"
 
     def refresh(self):
         """
@@ -27,16 +73,7 @@ class Payload(graphene.ObjectType):
         print("Querying for payload status")
         self.power_on = not self.power_on
 
-    def set_power_on(self, power_on):
-        """
-        Controls the power state of the payload
-        """
 
-        print("Sending new power state to payload")
-        print("Previous State: {}".format(self.power_on))
-        print("New State: {}".format(power_on))
-        self.power_on = power_on
-        return Status(status=True, subsystem=self)
 
     def send_message(self, message):
         print("Sending message to the pi: " + str(message))
@@ -62,6 +99,7 @@ class Payload(graphene.ObjectType):
         except Exception as e:
             print("Error sending message to pi: " + str(e))
             return Status(status=False, subsystem=self)
+
 
 class Status(graphene.ObjectType):
     """
