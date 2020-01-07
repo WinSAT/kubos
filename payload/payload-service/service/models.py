@@ -10,10 +10,11 @@ __license__ = "MIT"
 
 import graphene
 import serial
+import time
 
 # send message to payload over serial
-def send_message(self, message):
-    print("Sending message to the payload: " + str(message))
+def send_message(message):
+    #print("Sending message to the payload: " + str(message))
     try:
         # UART.setup("UART1")
         ser = serial.Serial(
@@ -28,15 +29,33 @@ def send_message(self, message):
         if ser.isOpen():
             print("Serial is open. Sending message to the pi.")
             ser.write(str.encode(message));
-            ser.close()
-            return Status(status=True, subsystem=self)
+            #ser.close()
+            #return Status(status=True, subsystem=self)
         else:
             ser.close()
-            return Status(status=False, subsystem=self)
+            #return Status(status=False, subsystem=self)
+            return "Could not open serial port."
     except Exception as e:
-        print("Error sending message to pi: " + str(e))
-        return Status(status=False, subsystem=self)s
+        return "Error sending message to pi: " + str(e)
+        #return Status(status=False, subsystem=self)
 
+    time.sleep(1)
+    #ser.close()
+    #ser.open()
+    if ser.isOpen():
+        print("Port is open to read response from pi.")
+        #print("Serial is open. Sending message to the pi.")
+        response = ser.readline();
+        response = response.decode('utf-8')
+        ser.close()
+        #return Status(status=True, subsystem=self)
+    else:
+        ser.close()
+        #return Status(status=False, subsystem=self)
+        return "Could not open serial port."
+
+    time.sleep(1)
+    return response
 
 class TelemetryNominal(graphene.ObjectType):
     # telemetry items for general status of hardware
@@ -154,7 +173,7 @@ class Payload(graphene.ObjectType):
 ################ queries ###################
     def ping(self):
         # should send hardware a ping and expect a pong back
-        return "pong"
+        return send_message("ping")
 
     def ack(self):
         # return some String

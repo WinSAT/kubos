@@ -49,8 +49,8 @@ code to setup/initialize payload subsystem (camera)
 
 def on_command(logger, SERVICES):
 
-    print("OnCommand logic")
-    print("Sending message 'hello' to pi...", end="")
+    logger.info("OnCommand logic")
+    logger.info("Pinging pi to see if uart setup...")
 
     request = '{ ping }'
 
@@ -66,11 +66,7 @@ def on_command(logger, SERVICES):
 
     response = SERVICES.query(service="payload-service", query=request)
     data = response["ping"]
-    if data == "pong":
-        print("Successfully pinged payload service")
-    else:
-        print("Unexpected payload service response: %s" % data)
-    print(response)
+    logger.info("Got back response from payload: %s" % data)
 
 '''
 code for sending/receiving commands/images from payload subsystem (camera)
