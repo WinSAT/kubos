@@ -129,8 +129,7 @@ class Payload(graphene.ObjectType):
 ################ queries ###################
     def ping(self):
         # should send hardware a ping and expect a pong back
-        self.UART.send("ping")
-        return self.UART.get()
+        return self.UART.send_wait("ping")
 
     def power(self):
         # return power state (for now just return ON)

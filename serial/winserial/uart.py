@@ -1,5 +1,6 @@
 import serial
 import app_api
+import time
 
 class UART:
     def __init__(self, port_name, timeout_value):
@@ -61,3 +62,36 @@ class UART:
         except Exception as e:
             self.logger.warn("Error sending message over uart port {}: {}".format(self.port, str(e)))
             return False
+
+    # send message to hardware over uart and expect a message back
+    def send_wait(self, message):
+        try:
+            # open uart port
+            self.serial.close()
+            self.serial.open()
+
+            if self.serial.isOpen():
+                # if uart port is open, try to send encoded string message
+                self.serial.write(str(message).encode('utf-8'))
+                self.logger.debug("UART port {} is open. Sent message: {}".format(self.port, str(message)))
+
+                # add some time to wait (may need to be adjusted)
+                time.sleep(1)
+
+                response = self.serial.readline()
+                self.logger.debug("Got message back: {}".format(str(response)))
+                response = (response.decode('utf-8'))
+                self.logger.debug("Decoded message: {}".format(response))
+                self.logger.debug("Uart port {} is closed. Read line: {}".format(self.port, response))
+                self.serial.close()
+                return response
+            else:
+                # if could not open uart port, return failure
+                self.serial.close()
+                self.logger.warn("Could not open serial port: {}".format(self.port))
+                return "error"
+
+        # return failure if exception during write/encoding
+        except Exception as e:
+            self.logger.warn("Error sending message over uart port {}: {}".format(self.port, str(e)))
+            return "error"
