@@ -15,10 +15,10 @@ _payload = Payload()
 type Query {
     ping(): String
     power(): PowerState
-    config(): String
-    errors(): [String] # Error descriptions if there are any, or empty if there aren't
+    # config(): String
+    # errors(): [String] # Error descriptions if there are any, or empty if there aren't
     telemetry(): Telemetry
-    testResults(): TestResults
+    # testResults(): TestResults
 }
 '''
 class Query(graphene.ObjectType):
@@ -34,15 +34,6 @@ class Query(graphene.ObjectType):
 
     '''
     query {
-        ping
-    }
-    '''
-    ack = graphene.String()
-    def resolve_ack(self, info):
-        return _payload.ack()
-
-    '''
-    query {
         power { state }
     }
     '''
@@ -55,18 +46,18 @@ class Query(graphene.ObjectType):
         config
     }
     '''
-    config = graphene.String()
-    def resolve_config(self, info):
-        return _payload.config()
+    #config = graphene.String()
+    #def resolve_config(self, info):
+    #    return _payload.config()
 
     '''
     query {
         errors
     }
     '''
-    errors = graphene.List(graphene.String)
-    def resolve_errors(self, info):
-        return _payload.errors()
+    #errors = graphene.List(graphene.String)
+    #def resolve_errors(self, info):
+    #    return _payload.errors()
 
     '''
     query {
@@ -91,16 +82,11 @@ class Query(graphene.ObjectType):
     }
     }
     '''
-    testResults = graphene.Field(TestResults)
-    def resolve_testResults(self, info):
-        return _payload.testResults()
+    #testResults = graphene.Field(TestResults)
+    #def resolve_testResults(self, info):
+    #    return _payload.testResults()
 
 ################## MUTATIONS #################
-class Noop(graphene.Mutation):
-    Output = MutationResult
-    def mutate(self, info):
-        return _payload.noop()
-
 '''
 mutation {
     controlPower(controlPowerInput: {state: OFF}) {
@@ -127,13 +113,13 @@ mutation {
     }
 }
 '''
-class ConfigureHardware(graphene.Mutation):
-    class Arguments:
-        configureHardwareInput = ConfigureHardwareInput()
+#class ConfigureHardware(graphene.Mutation):
+#    class Arguments:
+#        configureHardwareInput = ConfigureHardwareInput()
 
-    Output = ConfigureHardwarePayload
-    def mutate(self, info, configureHardwareInput):
-        return _payload.configureHardware(configureHardwareInput)
+#    Output = ConfigureHardwarePayload
+#    def mutate(self, info, configureHardwareInput):
+#        return _payload.configureHardware(configureHardwareInput)
 
 # Hardware testing has 2 levels:
 # INTEGRATION is to test the FSW's compatibility with the unit
@@ -153,13 +139,13 @@ mutation {
 }
 }
 '''
-class TestHardware(graphene.Mutation):
-    class Arguments:
-        testHardwareInput = TestHardwareInput()
+#class TestHardware(graphene.Mutation):
+#    class Arguments:
+#        testHardwareInput = TestHardwareInput()
 
-    Output = TestHardwarePayload
-    def mutate(self, info, testHardwareInput):
-        return _payload.testHardware(testHardwareInput)
+#    Output = TestHardwarePayload
+#    def mutate(self, info, testHardwareInput):
+#        return _payload.testHardware(testHardwareInput)
 
 '''
 mutation {
@@ -196,10 +182,10 @@ type Mutation {
 }
 '''
 class Mutation(graphene.ObjectType):
-    noop = Noop.Field()
+    #noop = Noop.Field()
     controlPower = ControlPower.Field()
-    configureHardware = ConfigureHardware.Field()
-    testHardware = TestHardware.Field()
+    #configureHardware = ConfigureHardware.Field()
+    #testHardware = TestHardware.Field()
     issueRawCommand = IssueRawCommand.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

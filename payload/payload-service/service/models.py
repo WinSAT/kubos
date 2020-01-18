@@ -11,51 +11,7 @@ __license__ = "MIT"
 import graphene
 import serial
 import time
-
-# send message to payload over serial
-def send_message(message):
-    #print("Sending message to the payload: " + str(message))
-    try:
-        # UART.setup("UART1")
-        ser = serial.Serial(
-            port='/dev/ttyS1',
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS,
-            timeout=1)
-        ser.close()
-        ser.open()
-        if ser.isOpen():
-            print("Serial is open. Sending message to the pi.")
-            ser.write(str.encode(message));
-            #ser.close()
-            #return Status(status=True, subsystem=self)
-        else:
-            ser.close()
-            #return Status(status=False, subsystem=self)
-            return "Could not open serial port."
-    except Exception as e:
-        return "Error sending message to pi: " + str(e)
-        #return Status(status=False, subsystem=self)
-
-    time.sleep(1)
-    #ser.close()
-    #ser.open()
-    if ser.isOpen():
-        print("Port is open to read response from pi.")
-        #print("Serial is open. Sending message to the pi.")
-        response = ser.readline();
-        response = response.decode('utf-8')
-        ser.close()
-        #return Status(status=True, subsystem=self)
-    else:
-        ser.close()
-        #return Status(status=False, subsystem=self)
-        return "Could not open serial port."
-
-    time.sleep(1)
-    return response
+from winserial import uart
 
 class TelemetryNominal(graphene.ObjectType):
     # telemetry items for general status of hardware
@@ -130,11 +86,12 @@ class IssueRawCommandPayload(graphene.ObjectType):
 
 class Payload(graphene.ObjectType):
 
-################ mutations #################
-    # send a command and if get appropirate response:
-    def noop(self):
-        return MutationResult(success=True, errors=[])
+    def __init__(self):
+        # global UART
+        self.UART = uart.UART('/dev/ttyS1', 1)
+	#return MutationResult(success=True, errors=[])
 
+################ mutations #################
     # Controls the power state of the payload
     def controlPower(self, controlPowerInput):
         print("Sending new power state to payload")
@@ -145,27 +102,26 @@ class Payload(graphene.ObjectType):
         power = PowerState(state=controlPowerInput.state)
         return ControlPowerPayload(success=True, errors=[], power=power)
 
-    def configureHardware(self, configureHardwareInput):
-        print("Configuring payload hardware")
+    #def configureHardware(self, configureHardwareInput):
+    #    print("Configuring payload hardware")
 
         # perform necessary payload configuration
 
         # if successful
-        return ConfigureHardwarePayload(success=True, errors=[], config="test")
+    #    return ConfigureHardwarePayload(success=True, errors=[], config="test")
 
-    def testHardware(self, testHardwareInput):
-        print("Testing payload hardware")
+    #def testHardware(self, testHardwareInput):
+    #    print("Testing payload hardware")
 
         # perform necessary payload Testing
 
         # return results
-        results = TestResults(success=True)
-        return TestHardwarePayload(success=True, errors=[], results=[])
+    #    results = TestResults(success=True)
+    #    return TestHardwarePayload(success=True, errors=[], results=[])
 
     def issueRawCommand(self, issueRawCommandInput):
-        print("Sending command to payload")
-
-        # perform actions to send command to payload
+        # send raw command to payload subsystem
+        self.UART.send(issueRawCommandInput)
 
         # return results
         return IssueRawCommandPayload(success=True, errors=[], ack="test")
@@ -173,32 +129,29 @@ class Payload(graphene.ObjectType):
 ################ queries ###################
     def ping(self):
         # should send hardware a ping and expect a pong back
-        return send_message("ping")
-
-    def ack(self):
-        # return some String
-        return "test"
+        self.UART.send("ping")
+        return self.UART.get()
 
     def power(self):
         # return power state (for now just return ON)
         return PowerState(state=PowerStateEnum.get(1))
 
-    def config(self):
-        return "test"
+    #def config(self):
+    #    return "test"
 
-    def errors(self):
+    #def errors(self):
         # error descriptions if any
-        return []
+    #    return []
 
     def telemetry(self):
         # get telemetry from hardware
         nominal = TelemetryNominal(field1nominal=0.1, field2nominal=0.2)
-        debug = TelemetryDebug(field1debug=1.2, field2debug=4.5)
-        return Telemetry(nominal=nominal, debug=debug)
+        #debug = TelemetryDebug(field1debug=1.2, field2debug=4.5)
+        return Telemetry(nominal=nominal)#, debug=debug)
 
-    def testResults(self):
+    #def testResults(self):
         # get test_results from hardware
-        telemetryNominal = TelemetryNominal(field1nominal=0.1, field2nominal=0.2)
-        telemetryDebug = TelemetryDebug(field1debug=1.2, field2debug=4.5)
-        return TestResults(success=True, telemetryNominal=telemetryNominal,
-        telemetryDebug=telemetryDebug, results1="pass", results2="fail")
+    #    telemetryNominal = TelemetryNominal(field1nominal=0.1, field2nominal=0.2)
+    #    telemetryDebug = TelemetryDebug(field1debug=1.2, field2debug=4.5)
+    #    return TestResults(success=True, telemetryNominal=telemetryNominal,
+    #    telemetryDebug=telemetryDebug, results1="pass", results2="fail")
