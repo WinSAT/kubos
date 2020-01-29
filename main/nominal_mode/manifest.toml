@@ -1,0 +1,4 @@
+name = "nominal-mode"
+executable = "nominal-mode.py"
+version = "1.0"
+author = "Jon Grebe"
