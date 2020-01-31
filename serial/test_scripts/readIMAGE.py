@@ -3,6 +3,7 @@
 import serial
 import time
 import argparse
+from xmodem import XMODEM
 
 # get port name from arguments
 parser = argparse.ArgumentParser()
@@ -22,6 +23,18 @@ time.sleep(1)
 ser.close()
 ser.open()
 
+def getc(size, timeout=1):
+	return ser.read(size) or None
+
+def putc(data, timeout=1):
+	return ser.write(data) # note that this ignores the timeout
+
+modem = XMODEM(getc, putc)
+
+def readImageX():
+	stream = open('image.jpg', 'wb')
+	modem.recv(stream)
+
 def readImage():
 	try:
 		if ser.isOpen():
@@ -33,31 +46,54 @@ def readImage():
 			while True:
 				buffer = ser.readline()
 				buffer = buffer.decode('utf-8')
-				if buffer == "<<SOF>>":
+				if buffer == "<<SOF>>\n":
 					break
 				else:
 					print("Waiting for SOF for image transfer. Got: {}".format(buffer))
 
 			# start reading image bytes
+			count = 0
 			with open("image.jpg","wb") as outfile:
+				print("Beginning reading of image data...")
 				while True:
-					buffer = ser.readline()
-					buffer = buffer.decode('utf-8')
+					try:
+						buffer = ser.readline()
+						buffer = base64.b64decode(buffer)
+						if buffer == "<<EOF>>":
+							break
+						buffer = "".join(buffer)
+						#print(buffer)
 
-					# check if done reading image
-					if buffer == "<<EOF>>":
-						print("Got image EOF. Done reading image.")
-						break
-					else:
-						print("Got data over serial: {}".format(buffer))
+						#if buffer == b'\n<<EOF>>\n':
+						#	break
+						#line = "".join(ser.readline())
+						
 						outfile.write(buffer)
+						#outfile.write(line)
+						
+						print(count)
+						count = count + 1
+						'''
+						buffer = buffer.decode('utf-8')
+						print("Decoded buffer: {}".format(buffer))
+						# check if done reading image
+						if buffer == "\n<<EOF>>\n":
+							print("Got image EOF. Done reading image.")
+							break
+						'''
+					except Exception as e:	
+						print("Error: {}".format(str(e)))
+						#print("Got data over serial: {}".format(buffer))
+						#outfile.write(buffer)
+						break
 		else:
 			print("Could not open serial port: {}".format(args.port_name))
 	except Exception as e:
 		print("Error trying to read image over serial: {}".format(str(e)))
 
 try:
-	readImage()
+	#readImage()
+	readImageX()
 except:
 	ser.flush()
 	ser.close()
