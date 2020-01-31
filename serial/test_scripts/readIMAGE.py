@@ -23,32 +23,38 @@ ser.close()
 ser.open()
 
 def readImage():
-	if ser.isOpen():
-		print('Sending request for image...')
-        message = "<<SENDIMAGE>>\n"
-		ser.write(message.encode('utf-8'))
+	try:
+		if ser.isOpen():
+			print('Sending request for image...')
+			message = "<<SENDIMAGE>>\n"
+			ser.write(message.encode('utf-8'))
 
-            # get initial SOF tag
-            while True:
-        		buffer = ser.readline()
-                buffer = buffer.decode('utf-8')
-        		if buffer == "<<SOF>>":
-                    break
-                else:
-                    print("Waiting for SOF for image transfer. Got: {}".format(buffer))
+			# get initial SOF tag
+			while True:
+				buffer = ser.readline()
+				buffer = buffer.decode('utf-8')
+				if buffer == "<<SOF>>":
+					break
+				else:
+					print("Waiting for SOF for image transfer. Got: {}".format(buffer))
 
-            # start reading image bytes
-                    with open("somefile.txt","wb") as outfile:
+			# start reading image bytes
+			with open("image.jpg","wb") as outfile:
+				while True:
+					buffer = ser.readline()
+					buffer = buffer.decode('utf-8')
 
-            while True:
-                buffer = ser.readline()
-
-
-
-    			try:
-    				print(buffer.decode('utf-8'))
-    			except:
-    				print('decode fail:', str(buffer))
+					# check if done reading image
+					if buffer == "<<EOF>>":
+						print("Got image EOF. Done reading image.")
+						break
+					else:
+						print("Got data over serial: {}".format(buffer))
+						outfile.write(buffer)
+		else:
+			print("Could not open serial port: {}".format(args.port_name))
+	except Exception as e:
+		print("Error trying to read image over serial: {}".format(str(e)))
 
 try:
 	readImage()
