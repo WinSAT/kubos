@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
 """
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
+Main file for nominal mode operation which is the normal mode of operation and is
+started when the CDH is notified by EPS that system power is above a certain threshold.
+
+All non-critical components and functionlity of the satellite should be shut
+down. Transmit rate to the ground station should also be reduced. Only the
+most critical components are operational to conserve power.
 """
 
 __author__ = "Jon Grebe"
@@ -14,8 +18,7 @@ import argparse
 import sys
 
 def main():
-
-    logger = app_api.logging_setup("payload-nominal")
+    logger = app_api.logging_setup("critical-mode")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
@@ -42,29 +45,16 @@ def main():
 
 # logic run for application on OBC boot
 def on_boot(logger, SERVICES):
-    logger.debug("Setting up payload subsystem...")
-'''
-code to setup/initialize payload subsystem
-'''
+    pass
 
 # logic run when commanded by OBC
 def on_command(logger, SERVICES):
-    logger.info("Starting nominal operation for payload subsystem...")
-
-    while True:
-        # pinging payload subsystem
-        request = '{ ping }'
-        response = SERVICES.query(service="payload-service", query=request)
-        response = response["ping"]
-
-        if response == "pong":
-            logger.debug("Successful connection to payload subsystem")
-        else:
-            logger.warn("Unsuccessful connection to payload subsystem. Sent: {} | Received: {}. Trying again...".format(request, response))
-
 '''
-code for continuous nominal operation for payload
+1. Shut down all non-critical components and functionality (ex/ camera)
+2. Set slower speed of transmit rate to ground station
+3. Return to nominal operation when power level back above threshold
 '''
 
 if __name__ == "__main__":
     main()
+

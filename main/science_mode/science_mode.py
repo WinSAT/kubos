@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
 """
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
+Main file for science mode operation which is started when the CDH is notified
+that an image capture needs to be completed.
+
+The mode starts when an image capture is requested and ends when the image
+capture is completed.
 """
 
 __author__ = "Jon Grebe"
@@ -14,8 +17,7 @@ import argparse
 import sys
 
 def main():
-
-    logger = app_api.logging_setup("payload-nominal")
+    logger = app_api.logging_setup("critical-mode")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
@@ -42,28 +44,14 @@ def main():
 
 # logic run for application on OBC boot
 def on_boot(logger, SERVICES):
-    logger.debug("Setting up payload subsystem...")
-'''
-code to setup/initialize payload subsystem
-'''
+    pass
 
 # logic run when commanded by OBC
 def on_command(logger, SERVICES):
-    logger.info("Starting nominal operation for payload subsystem...")
-
-    while True:
-        # pinging payload subsystem
-        request = '{ ping }'
-        response = SERVICES.query(service="payload-service", query=request)
-        response = response["ping"]
-
-        if response == "pong":
-            logger.debug("Successful connection to payload subsystem")
-        else:
-            logger.warn("Unsuccessful connection to payload subsystem. Sent: {} | Received: {}. Trying again...".format(request, response))
-
 '''
-code for continuous nominal operation for payload
+1. Send command to payload to capture image at certain time (still need to figure out how timing will work)
+2. Wait for image capture to be completed.
+3. Once notified image capture completed, return to nominal mode of operation
 '''
 
 if __name__ == "__main__":
