@@ -1,0 +1,5 @@
+sudo vi /usr/lib/python3.7/site-packages/Adafruit_Blinka-3.7.1-py3.7.egg/board.py
+
+install various packages
+
+adarfuit_BBIO library must first be built host machine then moved

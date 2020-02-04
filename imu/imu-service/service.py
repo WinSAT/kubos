@@ -16,13 +16,13 @@ from kubos_service.config import Config
 from logging.handlers import SysLogHandler
 import sys
 
-config = Config("accelerometer-service")
+config = Config("imu-service")
 
 # Setup logging
-logger = logging.getLogger("accelerometer-service")
+logger = logging.getLogger("imu-service")
 logger.setLevel(logging.DEBUG)
 handler = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_DAEMON)
-formatter = logging.Formatter('accelerometer-service: %(message)s')
+formatter = logging.Formatter('imu-service: %(message)s')
 handler.formatter = formatter
 logger.addHandler(handler)
 

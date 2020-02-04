@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Main file for payload application that defines communcation between CDH and
-primary payload (camera) mainly through hardware payload-service
+Test python application for testing IMU hardware service.
 """
 
 __author__ = "Jon Grebe"
@@ -12,7 +11,13 @@ __license__ = "MIT"
 import app_api
 import argparse
 import sys
-from i2c import I2C
+import time
+#import board
+#import busio
+import adafruit_fxos8700
+
+from i2c_device import ADA_I2C
+from i2c_device import Kubos_I2C
 
 '''
     i2c_device = I2C(bus = 1)
@@ -62,12 +67,26 @@ def on_command(logger, SERVICES):
 
     while True:
         try:
+            time.sleep(1)
             # pinging payload subsystem
-            request = '{ x }'
-            response = SERVICES.query(service="accelerometer-service", query=request)
-            logger.debug("Got response from accelerometer service: {}".format(str(response)))
-            response = response["x"]
-            logger.debug("Got x data from accelerometer: {}".format(str(response)))
+            #request = '{ x }'
+            #response = SERVICES.query(service="accelerometer-service", query=request)
+            #logger.debug("Got response from accelerometer service: {}".format(str(response)))
+            #response = response["x"]
+            #logger.debug("Got x data from accelerometer: {}".format(str(response)))
+
+            #i2c = ADA_I2C(board.SCL, board.SDA)
+            i2c = Kubos_I2C(bus=2)
+            print('Using I2C Bus 2')
+            sensor = adafruit_fxos8700.FXOS8700(i2c)
+            print('Setup i2c done.')
+
+            while True:
+                accel_x, accel_y, accel_z = sensor.accelerometer
+                mag_x, mag_y, mag_z = sensor.magnetometer
+                print('Acceleration (m/s^2): ({0:0.3f}, {1:0.3f}, {2:0.3f})'.format(accel_x, accel_y, accel_z))
+                print('Magnetometer (uTesla): ({0:0.3f}, {1:0.3f}, {2:0.3f})'.format(mag_x, mag_y, mag_z))
+                time.sleep(1.0)
 
         except Exception as e:
             logger.warn("Unsuccessful getting data from accelerometer: {}. Trying again...".format(str(e)))
