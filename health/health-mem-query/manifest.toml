@@ -1,0 +1,4 @@
+name = "health-mem-query.py"
+executable = "health-mem-query.py"
+version = "1.0"
+author = "Jon Grebe"

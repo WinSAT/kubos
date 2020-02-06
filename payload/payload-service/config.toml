@@ -1,3 +1,4 @@
 [payload-service.addr]
 ip = "0.0.0.0"
-port = 8001
+port = 5003
+device = True

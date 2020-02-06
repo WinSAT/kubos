@@ -18,34 +18,34 @@ import app_api
 import sys
 
 def on_boot(logger):
-
-    logger.info("OnBoot logic")
-
-''''''''''''''''''''''' STEP 1 - HOLD TIME TRACKING ''''''''''''''''''''
-Hold time tracking done by U-boot environment variables. Two variables are used:
-    1) deployed: boolean True if satellite deployment already complete
-    2) deploy_start: string in seconds since unix epoch
-
-(The U-Boot environment is a block of memory that is kept on persistent storage
-and copied to RAM when U-Boot starts. It is used to store environment variables
-which can be used to configure the system.)
-'''
-    # set system time from real-time clock from OBC
-
-    # if (deployed)
-    #   complete recurring boot tasks
-    # else
-    #   check "deploy_start" has a value
-    #   yes:
-    #       resume from "deploy_start" time
-    #   no:
-    #       set "deploy_start"
-    #       begin timer
-    #   once timer ends...
-    #   check deployment tasks
-    #   set "deployed" to True if successful
+    pass
 
 def on_command(logger):
+    pass
+
+    ''''''''''''''''''''''' STEP 1 - HOLD TIME TRACKING ''''''''''''''''''''
+    Hold time tracking done by U-boot environment variables. Two variables are used:
+        1) deployed: boolean True if satellite deployment already complete
+        2) deploy_start: string in seconds since unix epoch
+
+    (The U-Boot environment is a block of memory that is kept on persistent storage
+    and copied to RAM when U-Boot starts. It is used to store environment variables
+    which can be used to configure the system.)
+    '''
+        # set system time from real-time clock from OBC
+
+        # if (deployed)
+        #   complete recurring boot tasks
+        # else
+        #   check "deploy_start" has a value
+        #   yes:
+        #       resume from "deploy_start" time
+        #   no:
+        #       set "deploy_start"
+        #       begin timer
+        #   once timer ends...
+        #   check deployment tasks
+        #   set "deployed" to True if successful
 
 def main():
 

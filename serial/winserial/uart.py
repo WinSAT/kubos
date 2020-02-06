@@ -15,8 +15,25 @@ class UART:
 
         self.logger = app_api.logging_setup("uart")
 
+        # setup xmodem for image transfers
+        modem = XMODEM(self.getc, self.putc)
+
+    def getc(size, timeout=1):
+        return self.serial(size) or None
+
+    def putc(data, timeout=1):
+        return self.serial.write(data) # note that this ignores the timeout
+
+    def readImage():
+        stream = open('~/images/image.jpg', 'wb')
+        modem.recv(stream)
+
+    def writeImage():
+        stream = open('~/images/image.jpg', 'rb')
+        modem.send(stream)
+
     # send message to hardware over uart
-    def send(self, message):
+    def write(self, message):
         try:
             # open uart port
             self.serial.close()
@@ -40,7 +57,7 @@ class UART:
             return False
 
     # get message from hardware over uart
-    def get(self):
+    def read(self):
         try:
             self.serial.close()
             self.serial.open()
@@ -95,3 +112,13 @@ class UART:
         except Exception as e:
             self.logger.warn("Error sending message over uart port {}: {}".format(self.port, str(e)))
             return "error"
+
+class UART_fake:
+    def __init__(self, return_code):
+        self.return_code = return_code
+    
+    def write(self, message):
+        pass
+    
+    def read(self):
+        return self.return_code

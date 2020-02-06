@@ -6,186 +6,85 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
+import logging
+from winapi import payload as payload_api
 
-# Local subsystem instance for tracking state
-# May not be neccesary when tied into actual hardware
-_payload = Payload()
+logger = logging.getLogger("payload-service")
 
 '''
 type Query {
     ping(): String
-    power(): PowerState
-    # config(): String
-    # errors(): [String] # Error descriptions if there are any, or empty if there aren't
-    telemetry(): Telemetry
-    # testResults(): TestResults
 }
 '''
 class Query(graphene.ObjectType):
 
     '''
-    query {
-        ping
-    }
-    '''
-    ping = graphene.String()
-    def resolve_ping(self, info):
-        return _payload.ping()
-
-    '''
-    query {
-        power { state }
-    }
-    '''
-    power = graphene.Field(PowerState)
-    def resolve_power(self, info):
-        return _payload.power()
-
-    '''
-    query {
-        config
-    }
-    '''
-    #config = graphene.String()
-    #def resolve_config(self, info):
-    #    return _payload.config()
-
-    '''
-    query {
-        errors
-    }
-    '''
-    #errors = graphene.List(graphene.String)
-    #def resolve_errors(self, info):
-    #    return _payload.errors()
-
-    '''
-    query {
-        telemetry {
-            nominal { field1nominal field2nominal }
-            debug { field1debug field2debug }
-            }
-    }
-    '''
-    telemetry = graphene.Field(Telemetry)
-    def resolve_telemetry(self, info):
-        return _payload.telemetry()
-
-    '''
-    query {
-    testResults {
-     telemetryNominal { field1nominal field2nominal }
-     telemetryDebug { field1debug field2debug }
-     success
-     results1
-     results2
-    }
-    }
-    '''
-    #testResults = graphene.Field(TestResults)
-    #def resolve_testResults(self, info):
-    #    return _payload.testResults()
-
-################## MUTATIONS #################
-'''
-mutation {
-    controlPower(controlPowerInput: {state: OFF}) {
-        success
-        errors
-        power { state }
+    {
+        ping {
+            success
+            errors
         }
     }
-'''
-class ControlPower(graphene.Mutation):
-    class Arguments:
-        controlPowerInput = ControlPowerInput()
+    '''
+    ping = graphene.Field(Result)
+    def resolve_ping(self, info):
+        payload = payload_api.PayloadAPI()
 
-    Output = ControlPowerPayload
-    def mutate(self, info, controlPowerInput):
-        return _payload.controlPower(controlPowerInput)
+        # should send hardware a ping and expect a pong back
+        success, errors = payload.write("ping")
+        # return results
+        return Result(success=success, errors=errors)
 
 '''
 mutation {
-     configureHardware(configureHardwareInput: {config: "test"}) {
+    captureImage {
         success
         errors
-        config
     }
 }
 '''
-#class ConfigureHardware(graphene.Mutation):
-#    class Arguments:
-#        configureHardwareInput = ConfigureHardwareInput()
+class imageTransfer(graphene.Mutation):
 
-#    Output = ConfigureHardwarePayload
-#    def mutate(self, info, configureHardwareInput):
-#        return _payload.configureHardware(configureHardwareInput)
+    Output = Result
+    def mutate(self, info, command):
+        payload = payload_api.PayloadAPI()
 
-# Hardware testing has 2 levels:
-# INTEGRATION is to test the FSW's compatibility with the unit
-# HARDWARE is to test that the hardware itself is functioning
-'''
-mutation {
- testHardware(testHardwareInput: {testType: HARDWARE}) {
-    success
-    errors
-    results {
-    success
-    telemetryNominal { field1nominal field2nominal }
-    telemetryDebug { field1debug field2debug }
-    results1
-    results2
-    }
-}
-}
-'''
-#class TestHardware(graphene.Mutation):
-#    class Arguments:
-#        testHardwareInput = TestHardwareInput()
+        # send raw command to payload subsystem
+        success, errors = payload.write("capture_image")
 
-#    Output = TestHardwarePayload
-#    def mutate(self, info, testHardwareInput):
-#        return _payload.testHardware(testHardwareInput)
+        # return results
+        return Result(success=success, errors=errors)
 
 '''
 mutation {
-     issueRawCommand(issueRawCommandInput: {command: "go"}) {
+    issueRawCommand(command: "command") {
         success
         errors
-        ack
     }
 }
 '''
 class IssueRawCommand(graphene.Mutation):
     class Arguments:
-        issueRawCommandInput = IssueRawCommandInput()
+        command = graphene.String()
 
-    Output = IssueRawCommandPayload
-    def mutate(self, info, issueRawCommandInput):
-        return _payload.issueRawCommand(issueRawCommandInput)
+    Output = Result
+    def mutate(self, info, command):
+        payload = payload_api.PayloadAPI()
+
+        # send raw command to payload subsystem
+        success, errors = payload.write(command)
+
+        # return results
+        return Result(success=success, errors=errors)
 
 '''
 type Mutation {
-    noop(): Noop
-    controlPower(
-        input: ControlPowerInput!
-    ): ControlPower
-    configureHardware(
-        input: ConfigureHardwareInput!
-    ): ConfigureHardware
-    testHardware(
-        input: TestHardwareInput!
-    ): TestHardware
     issueRawCommand(
         input: IssueRawCommandInput!
-    ): IssueRawCommand
+    ): Result
 }
 '''
 class Mutation(graphene.ObjectType):
-    #noop = Noop.Field()
-    controlPower = ControlPower.Field()
-    #configureHardware = ConfigureHardware.Field()
-    #testHardware = TestHardware.Field()
     issueRawCommand = IssueRawCommand.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

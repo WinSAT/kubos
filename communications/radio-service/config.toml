@@ -1,0 +1,15 @@
+[radio-service.addr]
+ip = "0.0.0.0"
+port = 5001
+
+[radio-service.comms]
+timeout = 1000
+ip = "0.0.0.0"
+
+comms-service = { git = "https://github.com/kubos/kubos" }
+failure = "0.1.2"
+juniper =  "0.11"
+kubos-service = { git = "https://github.com/kubos/kubos" }
+kubos-system = { git = "https://github.com/kubos/kubos" }
+log = "^0.4.0"
+serial = "0.4"

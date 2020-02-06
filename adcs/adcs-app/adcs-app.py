@@ -13,33 +13,25 @@ import argparse
 import sys
 
 def on_boot(logger):
-
-    print("OnBoot logic")
-
-'''
-code to setup/initialize adcs subsystem
-'''
+    '''
+    code to setup/initialize adcs subsystem
+    '''
+    pass
 
 def on_command(logger):
-
-    print("OnCommand logic")
-
-    request = '''
-    mutation {
-        update(updateInput: {time: 1.0
-                        gpsLock: [1.0,2.0]})
-        {
-        errors
-        success
-        }
-    }
     '''
-    response = SERVICES.query(service="adcs-service", query=request)
-    print(response)
+    code for sending/receiving commands/telemetry from adcs subsystem
+    '''
+    while True:
+        # pinging adcs subsystem
+        request = '{ ping }'
+        response = SERVICES.query(service="adcs-service", query=request)
+        response = response["ping"]
 
-'''
-code for sending/receiving commands/telemetry from adcs subsystem
-'''
+        if response == "pong":
+            logger.debug("Successful connection to adcs subsystem")
+        else:
+            logger.warn("Unsuccessful connection to adcs subsystem. Sent: {} | Received: {}. Trying again...".format(request, response))
 
 def main():
 

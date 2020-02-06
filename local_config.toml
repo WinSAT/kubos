@@ -37,10 +37,29 @@ port = 8030
 ip = "0.0.0.0"
 port = 8050
 
-[payload-service.addr]
-ip = "0.0.0.0"
-port = 8001
-
 [accelerometer-service.addr]
 ip = "0.0.0.0"
 port = 7999
+
+
+
+
+[payload-service.addr]
+ip = "0.0.0.0"
+port = 5001
+
+[eps-service.addr]
+ip = "0.0.0.0"
+port = 5002
+
+[radio-service.addr]
+ip = "0.0.0.0"
+port = 5003
+
+[adcs-service.addr]
+ip = "0.0.0.0"
+port = 5004
+
+[imu-service.addr]
+ip = "0.0.0.0"
+port = 5005

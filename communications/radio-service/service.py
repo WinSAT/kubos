@@ -16,13 +16,13 @@ from kubos_service.config import Config
 from logging.handlers import SysLogHandler
 import sys
 
-config = Config("adcs-service")
+config = Config("radio-service")
 
 # Setup logging
-logger = logging.getLogger("adcs-service")
+logger = logging.getLogger("radio-service")
 logger.setLevel(logging.DEBUG)
 handler = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_DAEMON)
-formatter = logging.Formatter('adcs-service: %(message)s')
+formatter = logging.Formatter('radio-service: %(message)s')
 handler.formatter = formatter
 logger.addHandler(handler)
 
