@@ -1,0 +1,4 @@
+name = "health-clear-database.py"
+executable = "health-clear-database.py"
+version = "1.0"
+author = "Jon Grebe"

@@ -74,6 +74,7 @@ def on_command(logger, SERVICES):
 
     except Exception as e:
         logger.error("Error retrieving memory information from monitor service: {}".format(str(e)))
+        sys.exit(1)
 
     # add memory telemetry to database
     try:

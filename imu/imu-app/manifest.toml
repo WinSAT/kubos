@@ -1,4 +1,0 @@
-name = "imu-app"
-executable = "imu-app.py"
-version = "1.0"
-author = "Jon Grebe"

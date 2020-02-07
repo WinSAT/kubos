@@ -6,25 +6,37 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
+from winapi import FXOS8700
 
-# Local subsystem instance for tracking state
-# May not be neccesary when tied into actual hardware
-_accelerometer = Accelerometer()
+_fxos8700 = FXOS8700.FXOS8700(bus=2)
 
 '''
 type Query {
-    x(): Float
+    mag(): MagResult
+    acc(): AccResult
 }
 '''
 class Query(graphene.ObjectType):
 
     '''
     query {
-        x
+        mag
     }
     '''
-    x = graphene.Float()
-    def resolve_x(self, info):
-        return _accelerometer.x()
+    mag = graphene.Field(MagnetometerResult)
+    def resolve_mag(self, info):
+        success, errors, x, y, z = _fxos8700.mag()
+        return MagnetometerResult(success=success, errors=errors, magData=Magnetometer(x=x, y=y, z=z))
+
+
+    '''
+    query {
+        acc
+    }
+    '''
+    acc = graphene.Field(AccelerometerResult)
+    def resolve_acc(self, info):
+        success, errors, x, y, z = _fxos8700.acc()
+        return AccelerometerResult(success=success, errors=errors, accData=Accelerometer(x=x, y=y, z=z))
 
 schema = graphene.Schema(query=Query)

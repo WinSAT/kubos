@@ -1,0 +1,4 @@
+name = "imu-read-acc"
+executable = "imu-read-acc.py"
+version = "1.0"
+author = "Jon Grebe"
