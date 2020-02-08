@@ -48,7 +48,7 @@ def on_command(logger, SERVICES):
     # send request for image capture
     request = '''
     mutation {
-        issueRawCommand(command: "transfer_image") {
+        imageTransfer {
             success
             errors
         }
@@ -57,7 +57,7 @@ def on_command(logger, SERVICES):
     response = SERVICES.query(service="payload-service", query=request)
 
     # get results
-    result = response["issueRawCommand"]
+    result = response["imageTransfer"]
     success = result["success"]
     errors = result["errors"]
 

@@ -6,14 +6,16 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
-from winapi import FXOS8700
+from winapi import imu
 
-_fxos8700 = FXOS8700.FXOS8700(bus=2)
+_imu = imu.IMU(bus=2)
 
 '''
 type Query {
     mag(): MagResult
     acc(): AccResult
+    gyr(): GyrResult
+    qua(): QuaResult
 }
 '''
 class Query(graphene.ObjectType):
@@ -25,7 +27,7 @@ class Query(graphene.ObjectType):
     '''
     mag = graphene.Field(MagnetometerResult)
     def resolve_mag(self, info):
-        success, errors, x, y, z = _fxos8700.mag()
+        success, errors, x, y, z = _imu.mag()
         return MagnetometerResult(success=success, errors=errors, magData=Magnetometer(x=x, y=y, z=z))
 
 
@@ -36,7 +38,27 @@ class Query(graphene.ObjectType):
     '''
     acc = graphene.Field(AccelerometerResult)
     def resolve_acc(self, info):
-        success, errors, x, y, z = _fxos8700.acc()
+        success, errors, x, y, z = _imu.acc()
         return AccelerometerResult(success=success, errors=errors, accData=Accelerometer(x=x, y=y, z=z))
+
+    '''
+    query {
+        gyr
+    }
+    '''
+    gyr = graphene.Field(GyroscopeResult)
+    def resolve_gyr(self, info):
+        success, errors, x, y, z = _imu.gyr()
+        return GyroscopeResult(success=success, errors=errors, gyrData=Gyroscope(x=x, y=y, z=z))
+
+    '''
+    query {
+        qua
+    }
+    '''
+    qua = graphene.Field(QuaternionResult)
+    def resolve_qua(self, info):
+        success, errors, q1, q2, q3, q4 = _imu.qua()
+        return QuaternionResult(success=success, errors=errors, quaData=Quaternion(q1=q1,q2=q2,q3=q3,q4=q4))
 
 schema = graphene.Schema(query=Query)

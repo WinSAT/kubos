@@ -6,10 +6,9 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
-import logging
-from winapi import payload as payload_api
+from winapi import payload
 
-logger = logging.getLogger("payload-service")
+_payload = payload.Payload()
 
 '''
 type Query {
@@ -28,63 +27,51 @@ class Query(graphene.ObjectType):
     '''
     ping = graphene.Field(Result)
     def resolve_ping(self, info):
-        payload = payload_api.PayloadAPI()
-
         # should send hardware a ping and expect a pong back
-        success, errors = payload.write("ping")
+        success, errors = _payload.ping()
         # return results
         return Result(success=success, errors=errors)
 
 '''
 mutation {
-    captureImage {
+    image_capture() {
         success
         errors
     }
 }
 '''
-class imageTransfer(graphene.Mutation):
-
+class ImageTransfer(graphene.Mutation):
     Output = Result
-    def mutate(self, info, command):
-        payload = payload_api.PayloadAPI()
-
-        # send raw command to payload subsystem
-        success, errors = payload.write("capture_image")
-
+    def mutate(self, info):
+        # should send hardware command to payload to start image transfer
+        success, errors = _payload.image_transfer()
         # return results
         return Result(success=success, errors=errors)
 
 '''
 mutation {
-    issueRawCommand(command: "command") {
+    image_transfer() {
         success
         errors
     }
 }
 '''
-class IssueRawCommand(graphene.Mutation):
-    class Arguments:
-        command = graphene.String()
-
+class ImageCapture(graphene.Mutation):
     Output = Result
-    def mutate(self, info, command):
-        payload = payload_api.PayloadAPI()
-
-        # send raw command to payload subsystem
-        success, errors = payload.write(command)
-
+    def mutate(self, info):
+        # should send hardware command to payload to start image capture
+        success, errors = _payload.image_capture()
         # return results
         return Result(success=success, errors=errors)
 
 '''
 type Mutation {
-    issueRawCommand(
-        input: IssueRawCommandInput!
-    ): Result
+    imageCapture(): Result
+    imageTransfer(): Result
 }
 '''
 class Mutation(graphene.ObjectType):
-    issueRawCommand = IssueRawCommand.Field()
+    imageCapture = ImageCapture.Field()
+    imageTransfer = ImageTransfer.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

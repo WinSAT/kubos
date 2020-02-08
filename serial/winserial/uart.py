@@ -14,23 +14,27 @@ class UART:
             timeout=timeout_value)
 
         self.logger = app_api.logging_setup("uart")
+        self.port_name = port_name
 
         # setup xmodem for image transfers
-        modem = XMODEM(self.getc, self.putc)
+        self.modem = XMODEM(self.getc, self.putc)
 
-    def getc(size, timeout=1):
+    def getc(self, size, timeout=1):
         return self.serial(size) or None
 
-    def putc(data, timeout=1):
+    def putc(self, data, timeout=1):
         return self.serial.write(data) # note that this ignores the timeout
 
-    def readImage():
-        stream = open('~/images/image.jpg', 'wb')
-        modem.recv(stream)
-
-    def writeImage():
-        stream = open('~/images/image.jpg', 'rb')
-        modem.send(stream)
+    def readImage(self):
+        try:
+            stream = open("~/images/image.jpg", 'wb')
+            response = modem.recv(stream)
+            if response is None:
+                return False, ["Error xmodem reading stream: Got None return code."]
+            else:
+                return True, []
+        except Exception as e:
+            return False, ["Exception {} trying to read xmodem file stream: {}".format(type(e).__name__,str(e))]
 
     # send message to hardware over uart
     def write(self, message):
@@ -44,20 +48,20 @@ class UART:
                 self.serial.write(str(message).encode('utf-8'))
                 self.serial.close()
                 self.logger.debug("UART port {} is open. Sent message: {}".format(self.port, str(message)))
-                return True
+                return True, []
             else:
                 # if could not open uart port, return failure
                 self.serial.close()
                 self.logger.warn("Could not open serial port: {}".format(self.port))
-                return False
+                return False, ["Serial port not open for write. Could not open port: {}".format(self.port_name)]
 
         # return failure if exception during write/encoding
         except Exception as e:
             self.logger.warn("Error sending message {} over uart port {}: {}".format(str(message), self.port, str(e)))
-            return False
+            return False, ["Exception {} trying to write from UART port: {}".format(type(e).__name__,str(e))]
 
     # get message from hardware over uart
-    def read(self):
+    def read(self, message):
         try:
             self.serial.close()
             self.serial.open()
@@ -68,19 +72,20 @@ class UART:
                 message = message.decode('utf-8')
                 self.logger.debug("Uart port {} is open. Read line: {}".format(message))
                 self.serial.close()
-                return True
+                return True, [], message
             else:
                 # if could not open uart port, return failure
                 self.serial.close()
                 self.logger.warn("Could not open serial port: {}".format(self.port))
-                return False
+                return False, ["Serial port not open for read. Could not open port: {}".format(self.port_name)], ""
 
         # return failure if exception during read/decoding
         except Exception as e:
             self.logger.warn("Error sending message over uart port {}: {}".format(self.port, str(e)))
-            return False
+            return False, ["Exception {} trying to read from UART port: {}".format(type(e).__name__,str(e))], ""
 
     # send message to hardware over uart and expect a message back
+''' 
     def send_wait(self, message):
         try:
             # open uart port
@@ -112,13 +117,16 @@ class UART:
         except Exception as e:
             self.logger.warn("Error sending message over uart port {}: {}".format(self.port, str(e)))
             return "error"
-
+'''
 class UART_fake:
-    def __init__(self, return_code):
-        self.return_code = return_code
-    
-    def write(self, message):
+    def __init__(self):
         pass
     
+    def write(self, message):
+        return True, []
+    
     def read(self):
-        return self.return_code
+        return True, []
+
+    def readImage(self):
+        return True, []

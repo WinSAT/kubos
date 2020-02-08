@@ -31,6 +31,17 @@ class Magnetometer(graphene.ObjectType):
     y = graphene.Float()
     z = graphene.Float()
 
+class Gyroscope(graphene.ObjectType):
+    x = graphene.Float()
+    y = graphene.Float()
+    z = graphene.Float()
+
+class Quaternion(graphene.ObjectType):
+    q1 = graphene.Float()
+    q2 = graphene.Float()
+    q3 = graphene.Float()
+    q4 = graphene.Float()
+
 class AccelerometerResult(graphene.ObjectType):
     errors = graphene.List(graphene.String)
     success = graphene.Boolean()
@@ -40,3 +51,13 @@ class MagnetometerResult(graphene.ObjectType):
     errors = graphene.List(graphene.String)
     success = graphene.Boolean()
     magData = graphene.Field(Magnetometer)
+
+class GyroscopeResult(graphene.ObjectType):
+    errors = graphene.List(graphene.String)
+    success = graphene.Boolean()
+    gyrData = graphene.Field(Gyroscope)
+
+class QuaternionResult(graphene.ObjectType):
+    errors = graphene.List(graphene.String)
+    success = graphene.Boolean()
+    quaData = graphene.Field(Quaternion)

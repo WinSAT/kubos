@@ -1,0 +1,4 @@
+name = "imu-read-gyr"
+executable = "imu-read-gyr.py"
+version = "1.0"
+author = "Jon Grebe"
