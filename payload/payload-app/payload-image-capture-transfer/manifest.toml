@@ -1,0 +1,4 @@
+name = "payload-image-capture-transfer.py"
+executable = "payload-image-capture-transfer.py"
+version = "1.0"
+author = "Jon Grebe"

@@ -6,7 +6,7 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
-from winapi import payload
+from obcapi import payload
 
 _payload = payload.Payload()
 

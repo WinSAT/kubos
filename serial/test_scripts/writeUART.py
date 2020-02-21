@@ -31,6 +31,7 @@ def sendHandler():
 
 try:
 	sendHandler()
-except:
+except Exception as e:
+	print("Exception: {}".format(str(e)))
 	ser.flush()
 	ser.close()

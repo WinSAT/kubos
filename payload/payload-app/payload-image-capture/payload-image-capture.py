@@ -27,7 +27,7 @@ def main():
         SERVICES = app_api.Services(args.config[0])
     else:
         # else use default global config file
-        SERVICES = app_api.Services()
+        SERVICES = app_api.Services("/home/kubos/kubos/local_config.toml")
 
     # run app onboot or oncommand logic
     if args.run is not None:
@@ -64,7 +64,7 @@ def on_command(logger, SERVICES):
 
     # check results
     if success:
-        logger.info("Sent successful request to payload for image capture.")
+        logger.info("Payload completed successful image capture.")
     else:
         logger.warn("Unsuccessful image capture request to payload: {}.".format(errors))
 
