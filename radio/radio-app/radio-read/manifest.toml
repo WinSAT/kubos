@@ -1,0 +1,4 @@
+name = "radio-read.py"
+executable = "radio-read.py"
+version = "1.0"
+author = "Jon Grebe"
