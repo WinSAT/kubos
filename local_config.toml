@@ -56,3 +56,7 @@ port = 5004
 [imu-service.addr]
 ip = "0.0.0.0"
 port = 5005
+
+[rtc-service.addr]
+ip = "0.0.0.0"
+port = 5006
