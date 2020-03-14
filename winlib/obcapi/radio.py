@@ -53,7 +53,7 @@ _REG_TEST_PA2        = 0x5C
 _REG_TEST_DAGC       = 0x6F
 
 _TEST_PA1_NORMAL     = 0x55
-_TEST_PA1_BOOST      = 0x5D)
+_TEST_PA1_BOOST      = 0x5D
 _TEST_PA2_NORMAL     = 0x70
 _TEST_PA2_BOOST      = 0x7C
 
