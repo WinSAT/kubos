@@ -51,9 +51,17 @@ class GPIO:
             return False
 
     def direction(self, direction):
-        try:
-            os.system("echo out > /sys/class/gpio/gpio{}/direction".format(self.pin))
-            return True
-        except Exception as e:
-            self.logger.warning("Error setting direction of GPIO pin {}: {}".format(self.pin), str(e))
-            return False
+        if direction:
+            try:
+                os.system("echo out > /sys/class/gpio/gpio{}/direction".format(self.pin))
+                return True
+            except Exception as e:
+                self.logger.warning("Error setting direction of GPIO pin {}: {}".format(self.pin), str(e))
+                return False
+        else:
+            try:
+                os.system("echo in > /sys/class/gpio/gpio{}/direction".format(self.pin))
+                return True
+            except Exception as e:
+                self.logger.warning("Error setting direction of GPIO pin {}: {}".format(self.pin), str(e))
+                return False

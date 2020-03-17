@@ -11,8 +11,6 @@ __license__ = "MIT"
 import graphene
 from .models import *
 
-# Local subsystem instance for tracking state
-# May not be neccesary when tied into actual hardware
 _eps = EPS()
 
 '''
