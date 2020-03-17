@@ -1,0 +1,4 @@
+name = "activate-safe-mode"
+executable = "activate-safe-mode.py"
+version = "1.0"
+author = "Jon Grebe"

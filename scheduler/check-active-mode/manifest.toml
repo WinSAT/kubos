@@ -1,0 +1,4 @@
+name = "check-active-mode"
+executable = "check-active-mode.py"
+version = "1.0"
+author = "Jon Grebe"

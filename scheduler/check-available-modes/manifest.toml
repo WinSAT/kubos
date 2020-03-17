@@ -1,0 +1,4 @@
+name = "check-availables-modes"
+executable = "check-availables-modes.py"
+version = "1.0"
+author = "Jon Grebe"

@@ -1,0 +1,4 @@
+name = "import-raw-task-list"
+executable = "import-raw-task-list.py"
+version = "1.0"
+author = "Jon Grebe"

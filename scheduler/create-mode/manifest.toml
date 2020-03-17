@@ -1,0 +1,4 @@
+name = "create-mode"
+executable = "create-mode.py"
+version = "1.0"
+author = "Jon Grebe"

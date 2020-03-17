@@ -1,0 +1,4 @@
+name = "remove-task-list"
+executable = "remove-task-list.py"
+version = "1.0"
+author = "Jon Grebe"
