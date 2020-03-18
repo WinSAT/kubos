@@ -1,0 +1,43 @@
+{
+    "definitions": {
+      "command": {
+        "display_name": "Command Name To Display",
+        "description": "Description to give context to the operator.",
+        "tags": ["operations"],
+        "fields": [
+          {"name": "Field Name 1", "type": "number", "range": [1, 10]},
+          {"name": "Field Name 2", "type": "number", "value": 15},
+          {"name": "Field Name 3", "type": "string"},
+          {"name": "Field Name 4", "type": "text"},
+          {"name": "Field Name 5", "type": "enum", "enum": {
+            "LOW": 1, "MEDIUM": 5, "HIGH": 11
+          }}
+        ]
+      },
+      "deploy": {
+        "display_name": "Deploy",
+        "description": "Deploy the Solar Panels on the satellite.",
+        "tags": ["commissioning", "one-time"],
+        "fields": [
+          {"name": "timeout", "type": "number", "value": 10}
+        ]
+      },
+      "attitude_control": {
+        "display_name": "Attitude Control",
+        "description": "Sets the target quaternion for the ADCS",
+        "tags": ["operations", "adacs"],
+        "fields": [
+          {"name": "X", "type": "number"},
+          {"name": "Y", "type": "number"},
+          {"name": "Z", "type": "number"},
+          {"name": "W", "type": "number"}
+        ]
+      },
+      "hardware_test": {
+        "display_name": "Hardware Test",
+        "description": "Runs the test command for all subsystems.",
+        "tags": ["commissioning", "recovery"],
+        "fields": []
+      }
+    }
+  }

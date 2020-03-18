@@ -1,7 +1,7 @@
 # Command Definitions Documentation
 Command Definitions define the set of Commands that can be run on a System (a Satellite or Ground Station).
 
-Note: This information was retrieved from Major Tom Documentation provided by Kubos.
+Note: This information was retrieved from Major Tom Documentation provided by [Kubos](https://github.com/kubos).
 
 ## Structure
 
@@ -74,28 +74,28 @@ Field Definition keys:
 
 * name (required): The name of the field.
 * type (required): The type of the field — must be one of the following:
-* * number (deprecated, use integer instead)
-* * integer
-* * float
-* * enum
-* * string
-* * text
-* * datetime
+  * number (deprecated, use integer instead)
+  * integer
+  * float
+  * enum
+  * string
+  * text
+  * datetime
 * value (optional): A constant value that the field must always take.
 * default (optional): The default, placeholder, or starting value for a field that can be changed.
 * characterLimit (optional): A number indicating the character limit for a string or text field.
 * range (optional):
-* * For the number type, an array of exactly two elements defining the field's valid numeric range.
-* * For the string type, an array of one or more elements to populate a select field of valid string values for the field.
+  * For the number type, an array of exactly two elements defining the field's valid numeric range.
+  * For the string type, an array of one or more elements to populate a select field of valid string values for the field.
 * enum (required if type is enum, ignored otherwise)
-* * An object whose keys are string descriptions of their integer values. Values do not need to be sequential.
-* * Once the definition for an enum field is uploaded, its range of values will be displayed in a dropdown menu.
-* * When a user selects one of those values, only the numerical value will be sent over the API.
-* * See the example below for usage details of an enum field.
+  * An object whose keys are string descriptions of their integer values. Values do not need to be sequential.
+  * Once the definition for an enum field is uploaded, its range of values will be displayed in a dropdown menu.
+  * When a user selects one of those values, only the numerical value will be sent over the API.
+  * See the example below for usage details of an enum field.
 
 ### Example Usage of enum Type
 
-`In the command definition JSON`
+__In the command definition JSON__
 
 ```JSON
 {
@@ -120,7 +120,7 @@ Field Definition keys:
 }
 ```
 
-`In the command UI`
+__In the command UI__
 
 The above enum definition will translate to a dropdown list with the following values:
 
@@ -129,7 +129,7 @@ The above enum definition will translate to a dropdown list with the following v
 40 - MEDIUM
 80 - HIGH
 
-`What will be sent in the command fields JSON`
+__What will be sent in the command fields JSON__
 
 Selecting the option 40 - MEDIUM will result in the following JSON value being sent over the API:
 
@@ -140,16 +140,15 @@ Selecting the option 40 - MEDIUM will result in the following JSON value being s
 ```
 
 * datetime
-* * Setting the datetime type will display this field as an input, along with options to use a visual date & time picker and seconds manipulator. Starting values for the pickers correspond to the time that the UI for this command was opened.
-* * The output of the pickers, and the expected use of this type, is Unix UTC epoch time in milliseconds.
-* * The displayed text field can receive direct input and editing if needed.
-* * Sub-second milliseconds can only be adjusted manually in the text field, not using the picker or the seconds manipulator.
-datetime will accept any positive integer, so be careful.
-* * The keyword "now" can be used in the definition JSON under the default property. When this is set, the field will have the value of the time the UI for this command was opened. Otherwise, a default or value can be set as a Unix time value.
+  * Setting the datetime type will display this field as an input, along with options to use a visual date & time picker and seconds manipulator. Starting values for the pickers correspond to the time that the UI for this command was opened.
+  * The output of the pickers, and the expected use of this type, is Unix UTC epoch time in milliseconds.
+  * The displayed text field can receive direct input and editing if needed.
+  * Sub-second milliseconds can only be adjusted manually in the text field, not using the picker or the seconds manipulator datetime will accept any positive integer, so be careful.
+  * The keyword "now" can be used in the definition JSON under the default property. When this is set, the field will have the value of the time the UI for this command was opened. Otherwise, a default or value can be set as a Unix time value.
 
 ### Example Usage of datetime Type
 
-`In the command definition JSON`
+__In the command definition JSON__
 
 ```JSON
 {
