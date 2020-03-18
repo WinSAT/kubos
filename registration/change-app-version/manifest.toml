@@ -1,0 +1,4 @@
+name = "change-app-version"
+executable = "change-app-version.py"
+version = "1.0"
+author = "Jon Grebe"

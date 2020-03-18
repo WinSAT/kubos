@@ -1,0 +1,4 @@
+name = "start-app"
+executable = "start-app.py"
+version = "1.0"
+author = "Jon Grebe"

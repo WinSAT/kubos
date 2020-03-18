@@ -1,0 +1,4 @@
+name = "list-registered-apps"
+executable = "list-registered-apps.py"
+version = "1.0"
+author = "Jon Grebe"

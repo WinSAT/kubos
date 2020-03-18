@@ -1,0 +1,4 @@
+name = "deregister-app"
+executable = "deregister-app.py"
+version = "1.0"
+author = "Jon Grebe"

@@ -1,0 +1,4 @@
+name = "upgrade-app"
+executable = "upgrade-app.py"
+version = "1.0"
+author = "Jon Grebe"
