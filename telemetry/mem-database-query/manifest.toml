@@ -1,0 +1,4 @@
+name = "mem-database-query.py"
+executable = "mem-database-query.py"
+version = "1.0"
+author = "Jon Grebe"

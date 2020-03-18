@@ -12,11 +12,14 @@ __license__ = "MIT"
 import logging
 
 from service import schema
-from kubos_service.config import Config
 from logging.handlers import SysLogHandler
 import sys
+#import toml
 
+#print("hello")
+from kubos_service.config import Config
 config = Config("radio-service")
+#print(toml.dumps(config))
 
 # Setup logging
 logger = logging.getLogger("radio-service")

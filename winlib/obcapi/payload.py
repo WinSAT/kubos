@@ -14,7 +14,7 @@ class Payload:
 
     def __init__(self):
 
-        self.logger = app_api.logging_setup("payload-service")
+        self.logger = app_api.logging_setup("payload-api")
         self.use_uart = False
         try: 
             self.UART = uart.UART(1)

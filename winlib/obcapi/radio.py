@@ -78,6 +78,19 @@ RX_MODE      = 0b100
 # the warning to work around the error.
 # pylint: disable=too-many-instance-attributes
 
+class RADIO:
+
+    def __init__(self):
+
+        self.logger  = app_api.logging_setup("radio-api")
+        self.use_uart = False
+        try:
+            self.UART = uart.UART(2)
+            self.use_uart = True
+        except Exception as e:
+            self.logger.error("FATAL ERROR: Unable to open UART port {}:{}. No communication with radio. Using fake connection...".format(type(e).__name__, str(e)))
+
+
 class RFM69:
     """Interface to a RFM69 series packet radio.  Allows simple sending and
     receiving of wireless data at supported frequencies of the radio

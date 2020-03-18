@@ -1,2 +1,2 @@
-Radio subsystem service for accessing data/telemetry and sending commands
-to the radio for downlink/uplink to/from ground station
+Payload hardware service for sending and receiving commands and images
+from the payload subsystem (camera)

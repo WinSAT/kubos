@@ -1,4 +1,0 @@
-name = "radio-app"
-executable = "radio-app.py"
-version = "1.0"
-author = "Jon Grebe"

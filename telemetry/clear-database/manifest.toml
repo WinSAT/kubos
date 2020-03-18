@@ -1,0 +1,4 @@
+name = "clear-database.py"
+executable = "clear-database.py"
+version = "1.0"
+author = "Jon Grebe"
