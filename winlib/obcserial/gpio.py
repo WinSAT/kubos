@@ -16,14 +16,17 @@ class GPIO:
 
     def __init__(self, pin):
         self.pin = pin
-        self.logger = app_api.logging_setup("gpio-service")
+        self.logger = app_api.logging_setup("gpio-service-pin{}".format(self.pin))
 
     def attach(self):
         try:
-            os.system("echo {} > /sys/class/gpio/export".format(self.pin))
-            return True
+            if os.system("echo {} > /sys/class/gpio/export".format(self.pin)) == 0:
+                return True
+            else:
+                self.logger.warning("Error attaching GPIO pin {}. Using fake GPIO...".format(self.pin))
+                return False
         except Exception as e:
-            self.logger.warning("Error attaching GPIO pin {}: {}".format(self.pin), str(e))
+            self.logger.warning("Error attaching GPIO pin {}: {}. Using fake GPIO...".format(self.pin), str(e))
             return False
     
     def release(self):
@@ -42,7 +45,7 @@ class GPIO:
             self.logger.warning("Error turning on GPIO pin {}: {}".format(self.pin), str(e))
             return False
 
-    def off(self, register_address):
+    def off(self):
         try:
             os.system("echo 0 > /sys/class/gpio/gpio{}/value".format(self.pin))
             return True

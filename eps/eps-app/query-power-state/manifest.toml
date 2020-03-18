@@ -1,0 +1,4 @@
+name = "query-power-state"
+executable = "query-power-state.py"
+version = "1.0"
+author = "Jon Grebe"
