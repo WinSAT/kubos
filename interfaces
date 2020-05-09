@@ -1,0 +1,18 @@
+auto lo
+iface lo inet loopback
+
+# Default ethernet configuration
+# Update the 'address' value to set a custom static IP
+auto eth0
+iface eth0 inet static
+	address 192.168.7.2
+	netmask 255.255.0.0
+
+# Default SLIP configuration
+auto sl0
+iface sl0 inet static
+        address 192.168.0.2
+        netmask 255.255.255.0
+        pointopoint 192.168.0.1
+        pre-up slattach -s 115200 -p cslip /dev/ttyS5 &
+        post-up route add 192.168.0.2 dev lo
