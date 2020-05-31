@@ -1,0 +1,4 @@
+name = "add-entry-database"
+executable = "add-entry-database.py"
+version = "1.0"
+author = "Jon Grebe"
