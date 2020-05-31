@@ -1,0 +1,13 @@
+############ MONITORING ############
+
+URL FOR MONIT SERVICE MANAGER:
+http://192.168.7.2:7000/
+
+VIEW MONIT STATUS IN TERMINAL
+$ monit status
+
+MONIT CONFIG FILE
+$ /etc/monitrc
+
+
+############ MONITORING ############
