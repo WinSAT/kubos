@@ -1,4 +1,4 @@
-name = "health-mem-query.py"
+name = "health-mem-query"
 executable = "health-mem-query.py"
 version = "1.0"
 author = "Jon Grebe"

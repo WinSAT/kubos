@@ -1,4 +1,4 @@
-name = "clear-database.py"
+name = "clear-database"
 executable = "clear-database.py"
 version = "1.0"
 author = "Jon Grebe"

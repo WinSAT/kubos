@@ -93,7 +93,7 @@ def on_command(logger, SERVICES):
         author = app["author"]
         config = app["config"]
 
-        logger.info("\nRegistered app: {}\n executable: {}\n version: {}\n author: {}\n config: {}\n".format(name, executable, version, author, config))
+        logger.info("\nRegistered app: {}\n executable: {}\n version: {}\n author: {}\n config: {}\n active: {}\n".format(name, executable, version, author, config, active))
 
 
 if __name__ == "__main__":

@@ -74,7 +74,6 @@ def on_command(logger, SERVICES):
     }
     '''
     response = SERVICES.query(service="scheduler-service", query=request)
-    print(response)
     # get results
     response = response["availableModes"]
     modes = []

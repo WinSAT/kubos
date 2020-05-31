@@ -46,7 +46,7 @@ def on_boot(logger, SERVICES):
 # logic run when commanded by OBC
 def on_command(logger, SERVICES):
     # delete all telemetry entries before a certain time
-    timestamp = time.time() - 60
+    timestamp = time.time() - 86400
     try:
         '''
         mutation {
