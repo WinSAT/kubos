@@ -1,0 +1,28 @@
+{
+    "tasks": [
+        {
+            "description": "Get system memory and store in telemetry database",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "health-mem-query"
+            }
+        },
+        {
+            "description": "Clean telemetry database",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "clear-database"
+            }
+        },
+        {
+            "description": "Check memory level",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "health-mem-check"
+            }
+        }
+    ]
+}
