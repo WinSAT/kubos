@@ -1,0 +1,3 @@
+CHECK PROCESS eps-service PIDFILE /var/run/eps-service.pid
+	START PROGRAM = "/home/system/etc/init.d/S01eps-service start"
+	IF 3 RESTART WITHIN 10 CYCLES THEN TIMEOUT
