@@ -7,13 +7,13 @@ API for interacting with EPS subsystem
 import time
 import re
 from obcserial import gpio
-import app_api
+import logging
 
 class EPS:
 
     def __init__(self):
 
-        self.logger = app_api.logging_setup("eps-service")
+        self.logger = logging.getLogger("eps-service")
 
         # initialize GPIO pins
         self.PORT1 = gpio.GPIO(66)
@@ -21,6 +21,10 @@ class EPS:
         self.PORT3 = gpio.GPIO(45)
 
         self.fake_GPIO = True
+
+        self.PORT1.release()
+        self.PORT2.release()
+        self.PORT3.release()
 
         # attach GPIO pins
         if self.PORT1.attach():
