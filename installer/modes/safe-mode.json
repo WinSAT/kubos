@@ -2,7 +2,7 @@
     "tasks": [
         {
             "description": "Get system memory and store in telemetry database",
-            "delay": "60s",
+            "delay": "10s",
             "period": "60s",
             "app": {
                 "name": "health-mem-query"
@@ -10,7 +10,7 @@
         },
         {
             "description": "Clean telemetry database",
-            "delay": "60s",
+            "delay": "20s",
             "period": "60s",
             "app": {
                 "name": "clear-database"
@@ -18,10 +18,18 @@
         },
         {
             "description": "Check memory level",
-            "delay": "60s",
+            "delay": "30s",
             "period": "60s",
             "app": {
                 "name": "health-mem-check"
+            }
+        },
+        {
+            "description": "Set system time from RTC",
+            "delay": "40s",
+            "period": "60s",
+            "app": {
+                "name": "set-system-time"
             }
         }
     ]

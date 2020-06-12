@@ -1,0 +1,12 @@
+{
+    "tasks": [
+        {
+            "description": "Set system time from RTC",
+            "delay": "0s",
+            "period": "3600s",
+            "app": {
+                "name": "set-system-time"
+            }
+        }
+    ]
+}
