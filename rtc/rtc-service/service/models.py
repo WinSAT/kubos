@@ -14,14 +14,6 @@ class Result(graphene.ObjectType):
     errors = graphene.List(graphene.String)
     success = graphene.Boolean()
 
-#class Time(graphene.ObjectType):
-#    time = graphene.types.datetime.Time()
-#    result = Result()
-
 class RTCDateTime(graphene.ObjectType):
     datetime = graphene.types.datetime.DateTime()
-    result = Result()
-
-#class Date(graphene.ObjectType):
-#    datetime = graphene.types.datetime.Date()
-#    result = Result()
+    result = graphene.Field(Result)

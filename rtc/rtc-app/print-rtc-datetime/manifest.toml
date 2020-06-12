@@ -1,0 +1,4 @@
+name = "print-rtc-datetime"
+executable = "print-rtc-datetime.py"
+version = "1.0"
+author = "Jon Grebe"

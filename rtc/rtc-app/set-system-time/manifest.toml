@@ -1,0 +1,4 @@
+name = "set-system-time"
+executable = "set-system-time.py"
+version = "1.0"
+author = "Jon Grebe"

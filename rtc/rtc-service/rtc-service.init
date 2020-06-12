@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Start the RTC service in the background 
+# passing in the location of the config.toml file 
+# (in the same directory as the service)
+export PYTHONPATH=$PYTHONPATH:/home/kubos/winlib
+python /home/kubos/rtc/rtc-service/service.py -c /etc/kubos-config.toml &
+
+exit 0

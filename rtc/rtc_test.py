@@ -47,4 +47,4 @@ mday = _bcd2bin(i2c.read(0x04))
 month = _bcd2bin(i2c.read(0x05))
 year = _bcd2bin(i2c.read(0x06)) + 2000
 
-print("{}-{}-{} {}-{}-{}".format(year, month, mday, hour, min, sec))
+print("{}-{}-{}-{} {}-{}-{}".format(year, month, mday, wday, hour, min, sec))
