@@ -1,0 +1,4 @@
+name = "set-adcs-mode"
+executable = "set-adcs-mode.py"
+version = "1.0"
+author = "Jon Grebe"

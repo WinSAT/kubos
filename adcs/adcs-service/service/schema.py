@@ -10,24 +10,22 @@ __license__ = "MIT"
 
 import graphene
 from .models import *
+from obcapi import adcs 
 
 # Local subsystem instance for tracking state
 # May not be neccesary when tied into actual hardware
-_adcs = ADCS()
+_adcs = adcs.ADCS()
+
+############## QUERIES ################
 
 '''
 type Query {
     ping(): String
     power(): PowerState
-    config(): String
-    errors(): [String] # Error descriptions if there are any, or empty if there aren't
+    mode(): ModeState
+    orientation(): Orientation
+    spin(): Spin
     telemetry(): Telemetry
-    testResults(): TestResults
-
-####### Additional queries specific to adcs ########
-    mode(): String
-    orientation(): [Float]
-    spin(): [Float]
 }
 '''
 class Query(graphene.ObjectType):
@@ -43,108 +41,78 @@ class Query(graphene.ObjectType):
 
     '''
     query {
-        ping
-    }
-    '''
-    ack = graphene.String()
-    def resolve_ack(self, info):
-        return _adcs.ack()
-
-    '''
-    query {
         power { state }
     }
     '''
     power = graphene.Field(PowerState)
     def resolve_power(self, info):
-        return _adcs.power()
+        state = _adcs.power()
+        return PowerState(state=state)
 
     '''
     query {
-        config
+        mode { state }
     }
     '''
-    config = graphene.String()
-    def resolve_config(self, info):
-        return _adcs.config()
+    mode = graphene.Field(ModeState)
+    def resolve_mode(self, info):
+        state = _adcs.mode()
+        return ModeState(state=state)
 
     '''
     query {
-        errors
+        orientation { x y z yaw pitch roll }
     }
     '''
-    errors = graphene.List(graphene.String)
-    def resolve_errors(self, info):
-        return _adcs.errors()
+    orientation = graphene.Field(Orientation)
+    def resolve_orientation(self, info):
+        orient = _adcs.orientation()
+        return Orientation(x=orient[0],y=orient[1],z=orient[2],yaw=orient[3],pitch=orient[4],roll=orient[5])
 
+    '''
+    query {
+        spin { x y z }
+    }
+    '''
+    spin = graphene.Field(Spin)
+    def resolve_spin(self, info):
+        spin = _adcs.spin()
+        return Spin(x=spin[0],y=spin[1],z=spin[2])
+        
     '''
     query {
         telemetry {
-            nominal { field1nominal field2nominal }
-            debug { field1debug field2debug }
-            }
+            orientation { a b c d }
+            spin { x y z }
+            mode { state }
+            power { state }
+        }
     }
     '''
     telemetry = graphene.Field(Telemetry)
     def resolve_telemetry(self, info):
-        return _adcs.telemetry()
+        mode = _adcs.mode()
+        power = _adcs.power()
 
-    '''
-    query {
-    testResults {
-     telemetryNominal { field1nominal field2nominal }
-     telemetryDebug { field1debug field2debug }
-     success
-     results1
-     results2
-    }
-    }
-    '''
-    testResults = graphene.Field(TestResults)
-    def resolve_testResults(self, info):
-        return _adcs.testResults()
+        o = _adcs.orientation()
+        orientation = Orientation(x=o[0],y=o[1],z=o[2],yaw=o[3],pitch=o[4],roll=o[5])
+        
+        spin = _adcs.spin()
+        spin = Spin(x=spin[0],y=spin[1],z=spin[2])
 
-####### Additional queries specific to adcs ########
-    '''
-    query {
-        mode
-    }
-    '''
-    mode = graphene.String()
-    def resolve_mode(self, info):
-        return _adcs.mode()
-
-    '''
-    query {
-        orientation
-    }
-    '''
-    orientation = graphene.List(graphene.Float)
-    def resolve_orientation(self, info):
-        return _adcs.orientation()
-
-    '''
-    query {
-        spin
-    }
-    '''
-    spin = graphene.List(graphene.Float)
-    def resolve_spin(self, info):
-        return _adcs.spin()
-
+        return Telemetry(   ModeState(state=mode),
+                            PowerState(state=power),
+                            orientation,
+                            spin
+        )
 
 ############## MUTATIONS ################
-class Noop(graphene.Mutation):
-    Output = MutationResult
-    def mutate(self, info):
-        return _adcs.noop()
 
 '''
 mutation {
-    controlPower(controlPowerInput: {state: OFF}) {
+    controlPower(controlPowerInput: {power: OFF}) {
         success
         errors
-        power { state }
         }
     }
 '''
@@ -152,78 +120,16 @@ class ControlPower(graphene.Mutation):
     class Arguments:
         controlPowerInput = ControlPowerInput()
 
-    Output = ControlPowerADCS
+    Output = Result
     def mutate(self, info, controlPowerInput):
-        return _adcs.controlPower(controlPowerInput)
+        success, errors = _adcs.controlPower(controlPowerInput)
+        return Result(success=success, errors=errors)
 
 '''
 mutation {
-     configureHardware(configureHardwareInput: {config: "test"}) {
-        success
+    setMode(setModeInput: {mode: DETUMBLE}) {
         errors
-        config
-    }
-}
-'''
-class ConfigureHardware(graphene.Mutation):
-    class Arguments:
-        configureHardwareInput = ConfigureHardwareInput()
-
-    Output = ConfigureHardwareADCS
-    def mutate(self, info, configureHardwareInput):
-        return _adcs.configureHardware(configureHardwareInput)
-
-# Hardware testing has 2 levels:
-# INTEGRATION is to test the FSW's compatibility with the unit
-# HARDWARE is to test that the hardware itself is functioning
-'''
-mutation {
- testHardware(testHardwareInput: {testType: HARDWARE}) {
-    success
-    errors
-    results {
-    success
-    telemetryNominal { field1nominal field2nominal }
-    telemetryDebug { field1debug field2debug }
-    results1
-    results2
-    }
-}
-}
-'''
-class TestHardware(graphene.Mutation):
-    class Arguments:
-        testHardwareInput = TestHardwareInput()
-
-    Output = TestHardwareADCS
-    def mutate(self, info, testHardwareInput):
-        return _adcs.testHardware(testHardwareInput)
-
-'''
-mutation {
-     issueRawCommand(issueRawCommandInput: {command: "go"}) {
         success
-        errors
-        ack
-    }
-}
-'''
-class IssueRawCommand(graphene.Mutation):
-    class Arguments:
-        issueRawCommandInput = IssueRawCommandInput()
-
-    Output = IssueRawCommandADCS
-    def mutate(self, info, issueRawCommandInput):
-        return _adcs.issueRawCommand(issueRawCommandInput)
-
-################# Extra mutations specific to the ADCS ##############
-'''
-mutation {
-    setMode(setModeInput: {mode: "detumble"
-                           configuration: {parameter1: 1.0}})
-    {
-    errors
-    success
     }
 }
 '''
@@ -231,62 +137,23 @@ class SetMode(graphene.Mutation):
     class Arguments:
         setModeInput = SetModeInput()
 
-    Output = SetModeADCS
+    Output = Result
     def mutate(self, info, setModeInput):
-        return _adcs.setMode(setModeInput)
-
-'''
-mutation {
-    update(updateInput: {time: 1.0
-                    gpsLock: [1.0,2.0]})
-    {
-    errors
-    success
-    }
-}
-'''
-class Update(graphene.Mutation):
-    class Arguments:
-        updateInput = UpdateInput()
-
-    Output = UpdateADCS
-    def mutate(self, info, updateInput):
-        return _adcs.update(updateInput)
+        success, errors = _adcs.setMode(setModeInput)
+        return Result(success=success, errors=errors)
 
 '''
 type Mutation {
-    noop(): Noop
     controlPower(
         input: ControlPowerInput!
     ): ControlPower
-    configureHardware(
-        input: ConfigureHardwareInput!
-    ): ConfigureHardware
-    testHardware(
-        input: TestHardwareInput!
-    ): TestHardware
-    issueRawCommand(
-        input: IssueRawCommandInput!
-    ): IssueRawCommand
-
-################# Extra mutations specific to the ADCS ##############
     setMode(
         input: SetModeInput!
     ): SetMode
-    update(
-        input: UpdateInput
-    ): Update
 }
 '''
 class Mutation(graphene.ObjectType):
-    noop = Noop.Field()
     controlPower = ControlPower.Field()
-    configureHardware = ConfigureHardware.Field()
-    testHardware = TestHardware.Field()
-    issueRawCommand = IssueRawCommand.Field()
-
-    ################# Extra mutations specific to the ADCS ##############
     setMode = SetMode.Field()
-    update = Update.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
