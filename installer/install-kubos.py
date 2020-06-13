@@ -22,7 +22,8 @@ modes = {
             "health-mem-query": "/home/kubos/health/health-mem-query",
             "clear-database": "/home/kubos/telemetry/clear-database",
             "health-mem-check": "/home/kubos/health/health-mem-check",
-            "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time"
+            "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time",
+            "get-eps-telemetry": "/home/kubos/eps/eps-app/get-eps-telemetry"
         }
     },
     "science" : {

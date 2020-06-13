@@ -18,6 +18,7 @@ _eps = eps.EPS()
 '''
 type Query {
     power(): PowerState
+    telemetry(): Telemetry
 }
 '''
 class Query(graphene.ObjectType):
@@ -34,9 +35,25 @@ class Query(graphene.ObjectType):
     power = graphene.Field(PowerState)
     def resolve_power(self, info):
         power1, power2, power3 = _eps.power()
-
         return PowerState(power1=power1, power2=power2, power3=power3)
 
+    '''
+    query {
+        telemetry { 
+            power {
+                power1
+                power2
+                power3
+            }
+            battery
+        }
+    }
+    '''
+    telemetry = graphene.Field(Telemetry)
+    def resolve_telemetry(self, info):
+        power1, power2, power3 = _eps.power()
+        battery_level = _eps.battery()
+        return Telemetry(power=PowerState(power1=power1, power2=power2, power3=power3), battery=battery_level)
 
 ############## MUTATIONS ################
 '''

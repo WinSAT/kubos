@@ -32,3 +32,7 @@ class ControlPortInput(graphene.InputObjectType):
 class Result(graphene.ObjectType):
     errors = graphene.List(graphene.String)
     success = graphene.Boolean()
+
+class Telemetry(graphene.ObjectType):
+    power = graphene.Field(PowerState)
+    battery = graphene.Float()

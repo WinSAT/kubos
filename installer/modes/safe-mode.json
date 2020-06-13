@@ -2,7 +2,7 @@
     "tasks": [
         {
             "description": "Get system memory and store in telemetry database",
-            "delay": "10s",
+            "delay": "0s",
             "period": "60s",
             "app": {
                 "name": "health-mem-query"
@@ -10,7 +10,7 @@
         },
         {
             "description": "Clean telemetry database",
-            "delay": "20s",
+            "delay": "5s",
             "period": "60s",
             "app": {
                 "name": "clear-database"
@@ -18,7 +18,7 @@
         },
         {
             "description": "Check memory level",
-            "delay": "30s",
+            "delay": "10s",
             "period": "60s",
             "app": {
                 "name": "health-mem-check"
@@ -26,7 +26,15 @@
         },
         {
             "description": "Set system time from RTC",
-            "delay": "40s",
+            "delay": "15s",
+            "period": "60s",
+            "app": {
+                "name": "set-system-time"
+            }
+        },
+        {
+            "description": "Collect EPS telemetry and store in database",
+            "delay": "20s",
             "period": "60s",
             "app": {
                 "name": "set-system-time"

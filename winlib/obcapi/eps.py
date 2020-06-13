@@ -43,9 +43,11 @@ class EPS:
             self.PORT2.off()
             self.PORT3.off()
 
-        self.power1 = False
-        self.power2 = False
-        self.power3 = False
+        self.power1 = False # power to output 1 off
+        self.power2 = False # power to output 2 off
+        self.power3 = False # power to output 3 off
+
+        self.battery_level = 0  # initialize battery as emtpy (full is 100)
 
     # control power of ports
     def controlPort(self, controlPortInput):
@@ -88,6 +90,14 @@ class EPS:
     # get power state of all ports
     def power(self):
         return self.power1, self.power2, self.power3
+
+    # get current battery level as percentage
+    def battery(self):
+
+        # read ADC to get current battery level
+        self.battery_level = 100
+
+        return self.battery_level
 
     # release GPIO pins
     def __exit__(self):

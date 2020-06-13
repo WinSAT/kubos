@@ -1,0 +1,4 @@
+name = "get-eps-telemetry"
+executable = "get-eps-telemetry.py"
+version = "1.0"
+author = "Jon Grebe"
