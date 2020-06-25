@@ -17,11 +17,31 @@ _eps = eps.EPS()
 
 '''
 type Query {
+    ping(): pong
     power(): PowerState
     telemetry(): Telemetry
+    battery(): Float
 }
 '''
 class Query(graphene.ObjectType):
+
+    '''
+    query {
+        ping
+    }
+    '''
+    ping = graphene.String()
+    def resolve_ping(self, info):
+        return _eps.ping()
+
+    '''
+    query {
+        battery
+    }
+    '''
+    battery = graphene.Int()
+    def resolve_battery(self, info):
+        return _eps.battery()
 
     '''
     query {
