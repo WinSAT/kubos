@@ -82,19 +82,20 @@ class Payload:
     
 ######## QUERIES AND MUTATIONS ################
     def ping(self):
+        return "pong"
         # should send hardware a ping and expect a pong back
-        try:
-            command = "ping"
-            response = "pong"
-            if self.send_command(command):
-                if self.read_result(response):
-                    return True, []
-                else:
-                    return False, ["Payload did not send back sucessful result from {}".format(command)]
-            return False, ["Could not send payload successful {}".format(command)]
-
-        except Exception as e:
-            return False, [str(e)]
+        #try:
+        #    command = "ping"
+        #    response = "pong"
+        #    if self.send_command(command):
+        #        if self.read_result(response):
+        #            return True, []
+        #        else:
+        #            return False, ["Payload did not send back sucessful result from {}".format(command)]
+        #    return False, ["Could not send payload successful {}".format(command)]
+        #
+        #except Exception as e:
+        #    return False, [str(e)]
 
     def image_capture(self):
         # should send request to capture an image

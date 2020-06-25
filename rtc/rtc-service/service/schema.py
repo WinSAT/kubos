@@ -8,25 +8,34 @@ import graphene
 from .models import *
 from obcapi import DS3231
 
-RTC = DS3231.DS3231(2)
+_rtc = DS3231.DS3231(2)
 
-'''
-type Query {
-    dateTime {
-        datetime
-            result {
-			    success
-                errors
-        }
-    }
-}
-'''
 class Query(graphene.ObjectType):
 
+    '''
+    query {
+        ping
+    }
+    '''
+    ping = graphene.String()
+    def resolve_ping(self, info):
+        return _rtc.ping()
+
+    '''
+    type Query {
+        dateTime {
+            datetime
+                result {
+                    success
+                    errors
+            }
+        }
+    }
+    '''
     dateTime = graphene.Field(RTCDateTime)
     def resolve_dateTime(self, info):
         # should send hardware a ping and expect a pong back
-        _datetime = RTC.datetime()
+        _datetime = _rtc.datetime()
         # set success to true and error to nothing as default for now
         _success = True 
         _errors = []

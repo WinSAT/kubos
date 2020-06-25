@@ -19,18 +19,12 @@ class Query(graphene.ObjectType):
 
     '''
     {
-        ping {
-            success
-            errors
-        }
+        ping
     }
     '''
-    ping = graphene.Field(Result)
+    ping = graphene.String()
     def resolve_ping(self, info):
-        # should send hardware a ping and expect a pong back
-        success, errors = _payload.ping()
-        # return results
-        return Result(success=success, errors=errors)
+        return _payload.ping()
 
 '''
 mutation {

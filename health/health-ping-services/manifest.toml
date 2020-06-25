@@ -1,0 +1,4 @@
+name = "health-ping-services"
+executable = "health-ping-services.py"
+version = "1.0"
+author = "Jon Grebe"

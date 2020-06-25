@@ -27,7 +27,7 @@ def main():
         SERVICES = app_api.Services(args.config[0])
     else:
         # else use default global config file
-        SERVICES = app_api.Services("/home/kubos/kubos/local_config.toml")
+        SERVICES = app_api.Services("/etc/kubos-config.toml")
 
     # run app onboot or oncommand logic
     if args.run is not None:
@@ -48,21 +48,16 @@ def on_command(logger, SERVICES):
 
     # pinging payload subsystem
     request = ''' {
-        ping {
-            success
-            errors
-        }
+        ping 
     }
     '''
     response = SERVICES.query(service="payload-service", query=request)
 
     # get results
     result = response["ping"]
-    success = result["success"]
-    errors = result["errors"]
 
     # check results
-    if success:
+    if "pong"==result:
         logger.info("Successful ping connection to payload.")
     else:
         logger.warn("Unsuccessful ping connection to payload: {}.".format(errors))
