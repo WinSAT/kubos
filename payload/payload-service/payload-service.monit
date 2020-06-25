@@ -1,0 +1,3 @@
+CHECK PROCESS payload-service PIDFILE /var/run/payload-service.pid
+	START PROGRAM = "/home/system/etc/init.d/S01payload-service start"
+	IF 3 RESTART WITHIN 10 CYCLES THEN TIMEOUT
