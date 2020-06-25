@@ -1,0 +1,3 @@
+CHECK PROCESS radio-service PIDFILE /var/run/radio-service.pid
+	START PROGRAM = "/home/system/etc/init.d/S01radio-service start"
+	IF 3 RESTART WITHIN 10 CYCLES THEN TIMEOUT

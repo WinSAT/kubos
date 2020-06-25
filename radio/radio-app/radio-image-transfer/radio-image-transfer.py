@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that sends a ping to the ground station over radio.
+Mission application that transfers selfie-sat image to ground station using radio.
 """
 
 __author__ = "Jon Grebe"
@@ -11,6 +11,8 @@ __license__ = "MIT"
 import app_api
 import argparse
 import sys
+
+from obcapi import radio
 
 def main():
 
@@ -27,7 +29,7 @@ def main():
         SERVICES = app_api.Services(args.config[0])
     else:
         # else use default global config file
-        SERVICES = app_api.Services("/home/kubos/kubos/local_config.toml")
+        SERVICES = app_api.Services("/etc/kubos-config.toml")
 
     # run app onboot or oncommand logic
     if args.run is not None:
@@ -44,29 +46,14 @@ def on_boot(logger, SERVICES):
 
 # logic run when commanded by OBC
 def on_command(logger, SERVICES):
-    logger.info("Sending ping to ground station...")
+    
+    filename = "/home/kubos/image.jpg"
+    
+    logger.info("Sending image {} to ground station...".format(filename))
 
-    # send request for image capture
-    request = '''
-    query {
-        ping {
-            success
-            errors
-        }
-    }
-    '''
-    response = SERVICES.query(service="radio-service", query=request)
+    r = radio.RADIO()
 
-    # get results
-    result = response["ping"]
-    success = result["success"]
-    errors = result["errors"]
-
-    # check results
-    if success:
-        logger.info("SUCCESS: Sent ping to ground station.")
-    else:
-        logger.warn("ERROR sending ping to ground station: {}.".format(errors))
+    r.downlink_image(filename)
 
 if __name__ == "__main__":
     main()

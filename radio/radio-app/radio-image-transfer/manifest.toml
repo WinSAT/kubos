@@ -1,0 +1,4 @@
+name = "radio-image-transfer.py"
+executable = "radio-image-transfer.py"
+version = "1.0"
+author = "Jon Grebe"

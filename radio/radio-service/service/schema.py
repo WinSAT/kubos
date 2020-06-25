@@ -4,11 +4,17 @@ __author__ = "Jon Grebe"
 __version__ = "0.1.0"
 __license__ = "MIT"
 
+import threading
 import graphene
 from .models import *
 from obcapi import radio
 
-_radio = radio.Radio()
+# initialize radio - sync word from astrodev datasheet
+_radio = radio.RADIO(sync_word=b"\x48\x65")
+
+# start radio read thread for constantly receiving and handling any incoming packets
+read_thread = threading.Thread(target=_radio.main())
+read_thread.start()
 
 '''
 type Query {
@@ -19,19 +25,12 @@ class Query(graphene.ObjectType):
 
     '''
     {
-        ping {
-            success
-            errors
-        }
+        ping
     }
     '''
-    ping = graphene.Field(Result)
+    ping = graphene.String()
     def resolve_ping(self, info):
-        # should send hardware a ping and expect a pong back
-        success, errors = _radio.ping()
-
-        # return results
-        return Result(success=success, errors=errors)
+        return _radio.ping()
 
     '''
     {
@@ -45,7 +44,7 @@ class Query(graphene.ObjectType):
     read = graphene.Field(MessageResult)
     def resolve_read(self, info):
         # should send hardware a ping and expect a pong back
-        buffer = _radio.read()
+        buffer = _radio.receive()
         success = True
         errors = []
         # return results
