@@ -1,8 +1,20 @@
 {
     "tasks": [
+
+        {
+            "description": "Set system time from RTC",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "set-system-time"
+            }
+        },
+
+
+
         {
             "description": "Get system memory and store in telemetry database",
-            "delay": "0s",
+            "delay": "60s",
             "period": "60s",
             "app": {
                 "name": "health-mem-query"
@@ -10,7 +22,7 @@
         },
         {
             "description": "Clean telemetry database",
-            "delay": "5s",
+            "delay": "60s",
             "period": "60s",
             "app": {
                 "name": "clear-database"
@@ -18,26 +30,45 @@
         },
         {
             "description": "Check memory level",
-            "delay": "10s",
+            "delay": "60s",
             "period": "60s",
             "app": {
                 "name": "health-mem-check"
             }
         },
         {
-            "description": "Set system time from RTC",
-            "delay": "15s",
+            "description": "Ping all hardware services",
+            "delay": "60s",
             "period": "60s",
             "app": {
-                "name": "set-system-time"
+                "name": "health-ping-services"
             }
         },
         {
-            "description": "Collect EPS telemetry and store in database",
-            "delay": "20s",
+            "description": "Check battery level of EPS",
+            "delay": "60s",
             "period": "60s",
             "app": {
-                "name": "set-system-time"
+                "name": "query-battery-level"
+            }
+        },
+        
+
+
+        {
+            "description": "Collect EPS telemetry and store in database",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "get-eps-telemetry"
+            }
+        },
+        {
+            "description": "Collect ADCS telemetry and store in database",
+            "delay": "60s",
+            "period": "60s",
+            "app": {
+                "name": "get-adcs-telemetry"
             }
         }
     ]

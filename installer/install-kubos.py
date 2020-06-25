@@ -19,11 +19,19 @@ modes = {
         "name": "safe-mode",
         "mode": "safe",
         "apps": {
+            # health
             "health-mem-query": "/home/kubos/health/health-mem-query",
             "clear-database": "/home/kubos/telemetry/clear-database",
             "health-mem-check": "/home/kubos/health/health-mem-check",
+            "health-ping-services": "/home/kubos/health/health-ping-services",
+            "query-battery-level": "/home/kubos/eps/query-battery-level",
+
+            # rtc
             "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time",
-            "get-eps-telemetry": "/home/kubos/eps/eps-app/get-eps-telemetry"
+            
+            # telemetry
+            "get-eps-telemetry": "/home/kubos/eps/eps-app/get-eps-telemetry",
+            "get-adcs-telemetry": "/home/kubos/adcs/adcs-app/get-adcs-telemetry"
         }
     },
     "science" : {
