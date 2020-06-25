@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that sets the mode of the ADCS module (IDLE, DETUMBLE, POINTING).
+Mission application that sets the power state of the ADCS module (ON, OFF, RESET).
 """
 
 __author__ = "Jon Grebe"
@@ -14,12 +14,13 @@ import sys
 
 def main():
 
-    logger = app_api.logging_setup("set-adcs-mode")
+    logger = app_api.logging_setup("set-adcs-power")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', '-r', nargs=1)
     parser.add_argument('--config', '-c', nargs=1)
+    parser.add_argument('power')
     args = parser.parse_args()
 
     if args.config is not None:
@@ -32,40 +33,40 @@ def main():
     # run app onboot or oncommand logic
     if args.run is not None:
         if args.run[0] == 'OnBoot':
-            on_boot(logger, SERVICES)
+            on_boot(logger, SERVICES, args.power)
         elif args.run[0] == 'OnCommand':
-            on_command(logger, SERVICES)
+            on_command(logger, SERVICES, args.power)
     else:
-        on_command(logger, SERVICES)
+        on_command(logger, SERVICES, args.power)
 
 # logic run for application on OBC boot
-def on_boot(logger, SERVICES):
+def on_boot(logger, SERVICES, power):
     pass
 
 # logic run when commanded by OBC
-def on_command(logger, SERVICES):
+def on_command(logger, SERVICES, power):
     
     # send mutation to turn off EPS port
     request = '''
     mutation {
-        setMode(setModeInput: {mode: DETUMBLE}) {
-            errors
+        controlPower(controlPowerInput: {power: %s}) {
             success
+            errors
         }
     }
-    ''' % (port)
-    response = SERVICES.query(service="eps-service", query=request)
+    ''' % (power)
+    response = SERVICES.query(service="adcs-service", query=request)
 
     # get results
-    result = response["controlPort"]
+    result = response["controlPower"]
     success = result["success"]
     errors = result["errors"]
 
     # check results
     if success:
-        logger.info("Turned off port {}.".format(port))
+        logger.info("Set ADCS power={}.".format(power))
     else:
-        logger.warn("Uable to turn off port {}: {}.".format(port, errors))
+        logger.warn("Unable to set ADCS power={}: {}.".format(power, errors))
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,4 @@
+name = "get-adcs-orientation"
+executable = "get-adcs-orientation.py"
+version = "1.0"
+author = "Jon Grebe"

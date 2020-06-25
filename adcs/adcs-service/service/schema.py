@@ -82,7 +82,7 @@ class Query(graphene.ObjectType):
     '''
     query {
         telemetry {
-            orientation { a b c d }
+            orientation { x y z yaw pitch roll }
             spin { x y z }
             mode { state }
             power { state }

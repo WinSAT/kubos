@@ -1,0 +1,4 @@
+name = "get-adcs-power"
+executable = "get-adcs-power.py"
+version = "1.0"
+author = "Jon Grebe"

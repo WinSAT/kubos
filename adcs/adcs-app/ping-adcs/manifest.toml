@@ -1,0 +1,4 @@
+name = "ping-adcs"
+executable = "ping-adcs.py"
+version = "1.0"
+author = "Jon Grebe"
