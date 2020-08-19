@@ -7,7 +7,7 @@ The flight software utilizes the KubOS satellite software framework. [KubOS](htt
 
 ## Overview
 
-(https://github.com/WinSAT/kubos/tree/master/images/arch.png)(https://github.com/WinSAT/kubos/tree/master/images/software.png)
+![](https://github.com/WinSAT/kubos/tree/master/images/arch.png) ![](https://github.com/WinSAT/kubos/tree/master/images/software.png)
 
 The flight software runs on the main Onboard Computer (OBC) and interfaces will all of other major subsystems onboard the satellite:
 
