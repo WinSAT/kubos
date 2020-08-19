@@ -1,4 +1,4 @@
-# WinSAT CubeSat KubOS Flight Software for CDH
+# WinSAT KubOS Flight Software
 This repository contains the flight software prototype for the WinSAT-1 Cubesat as part of the CSDC 5 competition. [CSDC](https://www.csdcms.ca/)
 
 More information about the WinSAT CubeSat satellite and team can be found on the team website. [WinSAT](https://www.winsat.ca/)
@@ -7,7 +7,7 @@ The flight software utilizes the KubOS satellite software framework. [KubOS](htt
 
 ## Overview
 
-<img src="/images/arch.png" width="250"/> <img src="/images/software.png" width="250"/>
+<img src="/images/arch.png" width="500"/> <img src="/images/software.png" width="500"/>
 
 The flight software runs on the main Onboard Computer (OBC) and interfaces will all of other major subsystems onboard the satellite:
 
