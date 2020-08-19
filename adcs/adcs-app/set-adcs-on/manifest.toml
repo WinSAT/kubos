@@ -1,0 +1,4 @@
+name = "set-adcs-on"
+executable = "set-adcs-on.py"
+version = "1.0"
+author = "Jon Grebe"

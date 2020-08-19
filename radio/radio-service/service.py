@@ -24,13 +24,14 @@ config = Config("radio-service")
 # Setup logging
 logger = logging.getLogger("radio-service")
 logger.setLevel(logging.DEBUG)
-handler = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_DAEMON)
+logger.debug("DEBUG TEST")
+handler = SysLogHandler(address='/dev/log', facility=SysLogHandler.LOG_DAEMON, level=logging.DEBUG)
 formatter = logging.Formatter('radio-service: %(message)s')
 handler.formatter = formatter
 logger.addHandler(handler)
 
 # Set up a handler for logging to stdout
-stdout = logging.StreamHandler(stream=sys.stdout)
+stdout = logging.StreamHandler(stream=sys.stdout, level=logging.DEBUG)
 stdout.setFormatter(formatter)
 logger.addHandler(stdout)
 

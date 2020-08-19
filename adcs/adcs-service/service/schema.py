@@ -61,13 +61,13 @@ class Query(graphene.ObjectType):
 
     '''
     query {
-        orientation { x y z yaw pitch roll }
+        orientation { a b c d }
     }
     '''
     orientation = graphene.Field(Orientation)
     def resolve_orientation(self, info):
         orient = _adcs.orientation()
-        return Orientation(x=orient[0],y=orient[1],z=orient[2],yaw=orient[3],pitch=orient[4],roll=orient[5])
+        return Orientation(a=orient[0],b=orient[1],c=orient[2],d=orient[3])
 
     '''
     query {
@@ -82,7 +82,7 @@ class Query(graphene.ObjectType):
     '''
     query {
         telemetry {
-            orientation { x y z yaw pitch roll }
+            orientation { a b c d }
             spin { x y z }
             mode { state }
             power { state }
@@ -95,7 +95,7 @@ class Query(graphene.ObjectType):
         power = _adcs.power()
 
         o = _adcs.orientation()
-        orientation = Orientation(x=o[0],y=o[1],z=o[2],yaw=o[3],pitch=o[4],roll=o[5])
+        orientation = Orientation(a=o[0],b=o[1],c=o[2],d=o[3])
         
         spin = _adcs.spin()
         spin = Spin(x=spin[0],y=spin[1],z=spin[2])
@@ -127,33 +127,61 @@ class ControlPower(graphene.Mutation):
 
 '''
 mutation {
-    setMode(setModeInput: {mode: DETUMBLE}) {
+    setModePointing(pointingInput: {a: 1.0, b: 1.0, c: 1.0, d: 1.0}) {
         errors
         success
     }
 }
 '''
-class SetMode(graphene.Mutation):
+class SetModePointing(graphene.Mutation):
     class Arguments:
-        setModeInput = SetModeInput()
+        pointingInput = PointingInput()
 
     Output = Result
-    def mutate(self, info, setModeInput):
-        success, errors = _adcs.setMode(setModeInput)
+    def mutate(self, info, pointingInput):
+        success, errors = _adcs.setModePointing(pointingInput)
+        return Result(success=success, errors=errors)
+
+'''
+mutation {
+    setModeDetumble() {
+        errors
+        success
+    }
+}
+'''
+class SetModeDetumble(graphene.Mutation):
+    Output = Result
+    def mutate(self, info):
+        success, errors = _adcs.setModeDetumble()
+        return Result(success=success, errors=errors)
+
+'''
+mutation {
+    setModeIdle() {
+        errors
+        success
+    }
+}
+'''
+class SetModeIdle(graphene.Mutation):
+    Output = Result
+    def mutate(self, info):
+        success, errors = _adcs.setModeIdle()
         return Result(success=success, errors=errors)
 
 '''
 type Mutation {
-    controlPower(
-        input: ControlPowerInput!
-    ): ControlPower
-    setMode(
-        input: SetModeInput!
-    ): SetMode
+    controlPower(input: ControlPowerInput!): ControlPower
+    setModePointing (input: pointingInput!): Result
+    setModeDetumble (): Result
+    setModeIdle (): Result
 }
 '''
 class Mutation(graphene.ObjectType):
     controlPower = ControlPower.Field()
-    setMode = SetMode.Field()
+    setModeDetumble = SetModeDetumble.Field()
+    setModePointing = SetModePointing.Field()
+    setModeIdle = SetModeIdle.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

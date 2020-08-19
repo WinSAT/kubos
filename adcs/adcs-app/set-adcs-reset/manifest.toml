@@ -1,0 +1,4 @@
+name = "set-adcs-reset"
+executable = "set-adcs-reset.py"
+version = "1.0"
+author = "Jon Grebe"

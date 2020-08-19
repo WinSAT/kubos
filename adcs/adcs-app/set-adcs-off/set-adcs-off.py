@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that get the current orientation from ADCS module.
+Mission application that sets the power state of the ADCS module OFF.
 """
 
 __author__ = "Jon Grebe"
@@ -14,20 +14,15 @@ import sys
 
 def main():
 
-    logger = app_api.logging_setup("get-adcs-orientation")
+    logger = app_api.logging_setup("set-adcs-off")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', '-r', nargs=1)
-    parser.add_argument('--config', '-c', nargs=1)
     args = parser.parse_args()
 
-    if args.config is not None:
-        # use user config file if specified in command line
-        SERVICES = app_api.Services(args.config[0])
-    else:
-        # else use default global config file
-        SERVICES = app_api.Services("/etc/kubos-config.toml")
+    # else use default global config file
+    SERVICES = app_api.Services("/etc/kubos-config.toml")
 
     # run app onboot or oncommand logic
     if args.run is not None:
@@ -45,19 +40,26 @@ def on_boot(logger, SERVICES):
 # logic run when commanded by OBC
 def on_command(logger, SERVICES):
     
-    # send mutation to turn off EPS port
-    request = ''' query { orientation { a b c d } } '''
+    request = '''
+    mutation {
+        controlPower(controlPowerInput: {power: OFF}) {
+            success
+            errors
+        }
+    }
+    '''
     response = SERVICES.query(service="adcs-service", query=request)
 
     # get results
-    result = response["orientation"]
+    result = response["controlPower"]
+    success = result["success"]
+    errors = result["errors"]
 
-    a = result['a']
-    b = result['b']
-    c = result['c']
-    d = result['d']
-
-    logger.info("Current orientation ({}, {}, {}, {})".format(a, b, c, d))
+    # check results
+    if success:
+        logger.info("Set ADCS power OFF.")
+    else:
+        logger.warn("Unable to set ADCS power OFF: {}.".format(errors))
 
 if __name__ == "__main__":
     main()

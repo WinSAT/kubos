@@ -1,0 +1,4 @@
+name = "set-adcs-off"
+executable = "set-adcs-off.py"
+version = "1.0"
+author = "Jon Grebe"

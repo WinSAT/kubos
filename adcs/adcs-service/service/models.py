@@ -31,12 +31,10 @@ class ModeState(graphene.ObjectType):
 
 # ORIENTATION
 class Orientation(graphene.ObjectType):
-    x = graphene.Float()
-    y = graphene.Float()
-    z = graphene.Float()
-    yaw = graphene.Float()
-    pitch = graphene.Float()
-    roll = graphene.Float()
+    a = graphene.Float()
+    b = graphene.Float()
+    c = graphene.Float()
+    d = graphene.Float()
 
 # SPIN
 class Spin(graphene.ObjectType):
@@ -53,9 +51,12 @@ class Result(graphene.ObjectType):
 class ControlPowerInput(graphene.InputObjectType):
     power = graphene.Field(PowerStateEnum)
 
-# Set ADCS mode mutation input
-class SetModeInput(graphene.InputObjectType):
-    mode = graphene.Field(ModeStateEnum)
+# input orienatio
+class PointingInput(graphene.InputObjectType):
+    a = graphene.Float()
+    b = graphene.Float()
+    c = graphene.Float()
+    d = graphene.Float()
 
 class Telemetry(graphene.ObjectType):
     # telemetry items for general status of hardware

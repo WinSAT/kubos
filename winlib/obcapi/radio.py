@@ -9,6 +9,9 @@ import re
 import logging
 import math
 
+# Kubos
+import app_api
+
 # Adafruit
 import board
 import busio
@@ -16,7 +19,45 @@ import digitalio
 import adafruit_rfm69
 
 COMMANDS = { 
-    "ping": '\x00'
+    'HEALTH': {
+        'ping': '\x00',
+        'downlink_all': '\x02',
+        'downlink_log': '\x03',
+        'clear-database': '\x04',
+        'set-system-time': '\x05',
+        'get-telemetry': '\x06'
+    },
+    
+    
+    'EPS': {
+        #'eps_reset':    '\x10',
+        #'eps_on':       '\x11',
+        #'eps_off':      '\x12',
+
+        'turn-port-on-1':   '\x13',
+        'turn-port-on-2':   '\x14',
+        'turn-port-on-3':   '\x15',
+        'turn-port-off-1':  '\x16',
+        'turn-port-off-2':  '\x17',
+        'turn-port-off-3':  '\x18'
+    },
+
+    'ADCS': {
+        'set-adcs-idle':    '\x20',
+        'set-adcs-on':      '\x21',
+        'set-adcs-off':     '\x22',
+        'set-adcs-detumble':'\x23',
+        'set-adcs-pointing':'\x24',
+        'set-adcs-reset':   '\x25'
+    },
+
+    'PAYLOAD': {
+        'payload_reset':'\x30',
+        'payload_on':   '\x31',
+        'payload_off':  '\x32',
+        'image_capture':'\x33',
+        'image_downlink':'\x34',
+    }
 
 }
 
@@ -57,6 +98,9 @@ class RADIO:
 
         self.logger.debug("Finished radio initialization.")
 
+        # connect to Kubos services
+        self.SERVICES = app_api.Services("/etc/kubos-config.toml")
+
     def ping(self):
         """ For testing communications service connection """
         return "pong"
@@ -67,18 +111,50 @@ class RADIO:
         else:
             return False
 
-    def write(self, frame):
+    def write(self, packet):
         start_time = time.time()
-        # keep sending frame until we get confirmed returned acknowledgement
-        while (self.radio.send_with_ack(frame) == False):
-            # check for timeout
-            if self.timeout(start_time):
-                self.logger.warn("Timeout trying to write packet to radio.")
-                return False
-            else:
-                continue
 
-        self.logger.debug("Wrote packet to radio: {}".format(frame))
+        frames = []
+        if (len(packet) > 60):
+            # split into separate frames
+            size = 58
+            num = math.ceil(len(packet)/size)
+
+            for i in range(num):
+                
+                frame = packet[(i*size):((i+1)*size)]
+                
+                if i != (num-1):
+                    frame.extend(b'\x11\x11') # continuation bits
+                
+                frames.append(frame)
+                
+                #print("Frame {}: {}".format(i, frames[i]))
+
+            for n, frame in enumerate(frames):
+                while self.radio.send_with_ack(frame) is False:
+                    continue
+                #print("Frame {}/{}".format(n, len(frames)))
+                time.sleep(0.1)
+
+            self.radio.send_with_ack(bytearray(b'\x00\x01'))
+            #print("Sent {}".format(bytearray(b'\x00\x01')))
+
+        else:
+            # if small enough, just send all in one frame
+            frames = [packet]
+
+        # keep sending frame until we get confirmed returned acknowledgement
+        for frame in frames:
+            while (self.radio.send_with_ack(frame) == False):
+                # check for timeout
+                if self.timeout(start_time):
+                    self.logger.warn("Timeout trying to write packet to radio.")
+                    return False
+                else:
+                    continue
+            self.logger.debug("Wrote packet to radio: {}".format(frame))
+        
         return True
 
     def read(self):
@@ -131,23 +207,89 @@ class RADIO:
         opcode = bytes(frame[:1]).decode('utf-8')
         payload = bytes(frame[1:]).decode('utf-8')
 
-        #opcode = opcode.decode('utf-8')
-        #payload = opcode.decode('utf-8')
-
         self.logger.debug("Decoded packet into opcode: {} payload: {}".format(opcode, payload))
         return opcode, payload
 
     # encode message into radio protocol for sending (AX_25)
-    def encode(self, opcode, payload):
+    def encode(self, opcode, result, payload='\x00'):
         frame = bytearray()
         frame.extend(bytearray(opcode, 'utf-8'))
+        frame.extend(bytearray(result, 'utf-8'))
         frame.extend(bytearray(payload, 'utf-8'))
 
-        self.logger.debug("Encoded opcode: {} and payload: {} into frame: {}".format(opcode, payload, frame))
+        self.logger.debug("Encoded opcode: {} result: {} payload: {} into frame: {}".format(opcode, result, payload, frame))
         return frame
 
-    def main(self):
+    def start_app(self, app):
+        request = ''' mutation { startApp(name: "%s") { success, errors, pid } } ''' % (app)
+        response = self.SERVICES.query(service="app-service", query=request)
+        # get results
+        response = response["startApp"]
+        success = response["success"]
+        errors = response["errors"]
 
+        if success:
+            self.logger.debug("Success started app {} with pid: {}. Return ACK.".format(app, response["pid"]))
+            return True, []
+        else:
+            self.logger.warning("Unable to start app {}: {}. Return NACK".format(app, errors))
+            return False, errors
+    """
+    def health_handler(self, opcode):
+        health_dict = COMMANDS['HEALTH']
+        if (opcode == health_dict['ping']):
+            self.logger.debug("Got 'ping' command from ground station. Returning acknowledgement")
+            return True, []
+
+    
+    def eps_handler(self, received_opcode):
+        for app, opcode in COMMANDS['EPS'].items():
+            if (opcode == received_opcode):
+                self.logger.debug("Got {} command from ground station.".format(app))
+                return self.start_app()
+
+    def adcs_handler(self, received_opcode):
+        for app, opcode in COMMANDS['ADCS'].items():
+            if (opcode == received_opcode):
+                self.logger.debug("Got {} command from ground station.".format(app))
+
+                request = ''' mutation { startApp(name: "%s") { success, errors, pid } } ''' % (app)
+                response = self.SERVICES.query(service="app-service", query=request)
+                # get results
+                response = response["startApp"]
+                success = response["success"]
+                errors = response["errors"]
+                
+                if success:
+                    self.logger.debug("Success started app {} with pid: {}. Return ACK.".format(app, response["pid"]))
+                    return True, []
+                else:
+                    self.logger.warning("Unable to start app {}: {}. Return NACK".format(app, errors))
+                    return False, errors
+    """
+
+    def handler(self, command_opcode):
+        ''' Handle incoming message/comand '''
+
+        for subsystem in COMMANDS.values():
+            for app, opcode in subsystem.items(): 
+                if (command_opcode == opcode):
+                    # ping doesnt have an app, just return ack
+                    if opcode == '\x00':
+                        print("Got ping")
+                        return True, []
+                    else:                  
+                        return self.start_app(app)
+        
+        # didn't find opcode in list of valid opcodes
+        self.logger.warning("Command opcode: {} not found in list of valid opcodes".format(command_opcode))
+        errors = ["Invalid opcode: {}".format(opcode)]
+        self.logger.warn(errors)
+        return False, errors
+
+    def main(self):
+        self.logger = logging.getLogger("radio-service")
+        self.logger.setLevel(logging.DEBUG)
         self.logger.info("Starting main loop on radio for receiving packets")
         while (True):
             success, frame = self.read()
@@ -157,15 +299,15 @@ class RADIO:
 
             opcode, payload = self.decode(frame)
 
-            # received ping, send back acknowledgement
-            if (opcode == COMMANDS['ping']):
-                self.logger.debug("Got 'ping' command from ground station. Returning acknowledgement")
-                frame = self.encode(opcode, '\x00')
-            else:
-                self.logger.warn("Received command/opcode that is not in valid opcodes: {}.".format(opcode))
-                continue
+            success, errors = self.handler(opcode)
 
-            # return acknowledgement
+            if success:
+                frame = self.encode(opcode, '\x00') # success
+            else:
+                frame = self.encode(opcode, '\x01', errors) # failure
+
+            #print("Frame", frame, len(frame))
+            # return ack/nack
             self.write(frame)
 
     def __exit__(self):

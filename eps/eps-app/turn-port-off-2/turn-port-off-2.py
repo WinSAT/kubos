@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that turns on a output port on EPS module.
+Mission application that turns off a output port 2 on EPS module.
 """
 
 __author__ = "Jon Grebe"
@@ -14,13 +14,12 @@ import sys
 
 def main():
 
-    logger = app_api.logging_setup("turn-port-on")
+    logger = app_api.logging_setup("turn-port-off-2")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', '-r', nargs=1)
     parser.add_argument('--config', '-c', nargs=1)
-    parser.add_argument('port', type=int)
     args = parser.parse_args()
 
     if args.config is not None:
@@ -35,29 +34,29 @@ def main():
         if args.run[0] == 'OnBoot':
             on_boot(logger, SERVICES)
         elif args.run[0] == 'OnCommand':
-            on_command(logger, SERVICES, args.port)
+            on_command(logger, SERVICES)
     else:
-        on_command(logger, SERVICES, args.port)
+        on_command(logger, SERVICES)
 
 # logic run for application on OBC boot
 def on_boot(logger, SERVICES):
     pass
 
 # logic run when commanded by OBC
-def on_command(logger, SERVICES, port):
+def on_command(logger, SERVICES):
     
-    # send mutation to turn on EPS port
+    # send mutation to turn off EPS port
     request = '''
     mutation {
         controlPort(controlPortInput: {
-                    power: ON
-                    port: PORT%d })
+                    power: OFF
+                    port: PORT2 })
         {
         errors
         success
         }
     }
-    ''' % (port)
+    '''
     response = SERVICES.query(service="eps-service", query=request)
 
     # get results
@@ -67,9 +66,9 @@ def on_command(logger, SERVICES, port):
 
     # check results
     if success:
-        logger.info("Turned on port {}.".format(port))
+        logger.info("Turned off port 2.")
     else:
-        logger.warn("Uable to turn on port {}: {}.".format(port, errors))
+        logger.warn("Uable to turn off port 2: {}.".format(errors))
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that sets the power state of the ADCS module (ON, OFF, RESET).
+Mission application that turns on a output port 3 on EPS module.
 """
 
 __author__ = "Jon Grebe"
@@ -14,13 +14,12 @@ import sys
 
 def main():
 
-    logger = app_api.logging_setup("set-adcs-power")
+    logger = app_api.logging_setup("turn-port-on-3")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', '-r', nargs=1)
     parser.add_argument('--config', '-c', nargs=1)
-    parser.add_argument('power')
     args = parser.parse_args()
 
     if args.config is not None:
@@ -33,40 +32,43 @@ def main():
     # run app onboot or oncommand logic
     if args.run is not None:
         if args.run[0] == 'OnBoot':
-            on_boot(logger, SERVICES, args.power)
+            on_boot(logger, SERVICES)
         elif args.run[0] == 'OnCommand':
-            on_command(logger, SERVICES, args.power)
+            on_command(logger, SERVICES)
     else:
-        on_command(logger, SERVICES, args.power)
+        on_command(logger, SERVICES)
 
 # logic run for application on OBC boot
-def on_boot(logger, SERVICES, power):
+def on_boot(logger, SERVICES):
     pass
 
 # logic run when commanded by OBC
-def on_command(logger, SERVICES, power):
+def on_command(logger, SERVICES):
     
-    # send mutation to turn off EPS port
+    # send mutation to turn on EPS port
     request = '''
     mutation {
-        controlPower(controlPowerInput: {power: %s}) {
-            success
-            errors
+        controlPort(controlPortInput: {
+                    power: ON
+                    port: PORT3 })
+        {
+        errors
+        success
         }
     }
-    ''' % (power)
-    response = SERVICES.query(service="adcs-service", query=request)
+    '''
+    response = SERVICES.query(service="eps-service", query=request)
 
     # get results
-    result = response["controlPower"]
+    result = response["controlPort"]
     success = result["success"]
     errors = result["errors"]
 
     # check results
     if success:
-        logger.info("Set ADCS power={}.".format(power))
+        logger.info("Turned on port 3.")
     else:
-        logger.warn("Unable to set ADCS power={}: {}.".format(power, errors))
+        logger.warn("Uable to turn on port 3: {}.".format(errors))
 
 if __name__ == "__main__":
     main()

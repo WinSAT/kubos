@@ -13,42 +13,53 @@ import app_api
 import argparse
 import sys
 
+apps = {
+    # health
+    "health-mem-query": "/home/kubos/health/health-mem-query",
+    "clear-database": "/home/kubos/telemetry/clear-database",
+    "health-mem-check": "/home/kubos/health/health-mem-check",
+    "health-ping-services": "/home/kubos/health/health-ping-services",
+    "query-battery-level": "/home/kubos/eps/eps-app/query-battery-level",
+
+    # rtc
+    "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time",
+    
+    # telemetry
+    "get-eps-telemetry": "/home/kubos/eps/eps-app/get-eps-telemetry",
+    "get-adcs-telemetry": "/home/kubos/adcs/adcs-app/get-adcs-telemetry",
+
+    # eps
+    "turn-port-on-1": "/home/kubos/eps/eps-app/turn-port-on-1",
+    "turn-port-on-2": "/home/kubos/eps/eps-app/turn-port-on-2",
+    "turn-port-on-3": "/home/kubos/eps/eps-app/turn-port-on-3",
+    "turn-port-off-1": "/home/kubos/eps/eps-app/turn-port-off-1",
+    "turn-port-off-2": "/home/kubos/eps/eps-app/turn-port-off-2",
+    "turn-port-off-3": "/home/kubos/eps/eps-app/turn-port-off-3",
+
+    # adcs
+    "set-adcs-idle": "/home/kubos/adcs/adcs-app/set-adcs-idle",
+    "set-adcs-detumble": "/home/kubos/adcs/adcs-app/set-adcs-detumble",
+    "set-adcs-pointing": "/home/kubos/adcs/adcs-app/set-adcs-pointing",
+    "set-adcs-reset": "/home/kubos/adcs/adcs-app/set-adcs-reset",
+    "set-adcs-on": "/home/kubos/adcs/adcs-app/set-adcs-on",
+    "set-adcs-off": "/home/kubos/adcs/adcs-app/set-adcs-off"
+}
+
 modes = {
     "safe" : {
         "path": "/home/kubos/installer/modes/safe-mode.json",
         "name": "safe-mode",
-        "mode": "safe",
-        "apps": {
-            # health
-            "health-mem-query": "/home/kubos/health/health-mem-query",
-            "clear-database": "/home/kubos/telemetry/clear-database",
-            "health-mem-check": "/home/kubos/health/health-mem-check",
-            "health-ping-services": "/home/kubos/health/health-ping-services",
-            "query-battery-level": "/home/kubos/eps/query-battery-level",
-
-            # rtc
-            "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time",
-            
-            # telemetry
-            "get-eps-telemetry": "/home/kubos/eps/eps-app/get-eps-telemetry",
-            "get-adcs-telemetry": "/home/kubos/adcs/adcs-app/get-adcs-telemetry"
-        }
+        "mode": "safe"
     },
     "science" : {
         "path": "/home/kubos/installer/modes/science-mode.json",
         "name": "science-mode",
-        "mode": "science",
-        "apps": {
-            "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time"
-        }
+        "mode": "science"
     },
     "ini" : {
         "path": "/home/kubos/installer/modes/ini-mode.json",
         "name": "ini-mode",
-        "mode": "ini",
-        "apps": {
-            "set-system-time": "/home/kubos/rtc/rtc-app/set-system-time"
-        }
+        "mode": "ini"
     }
 }
 
@@ -116,92 +127,60 @@ def main():
 
     print("\n")
     ################## DEREGISTER ALL APPLICATIONS WITH APPLICATIONS SERVICE #######################
-    for mode, settings in modes.items():
-        for app, path in settings['apps'].items():
-            # send mutation to deregister app (name is required, version is optional)
-            request = '''
-            mutation {
-                uninstall(name: "%s", version: "1.0") {
-                    success,
-                    errors
-                }
+    for app in apps.keys():
+        # send mutation to deregister app (name is required, version is optional)
+        request = '''
+        mutation {
+            uninstall(name: "%s", version: "1.0") {
+                success,
+                errors
             }
-            ''' % (app)
-            response = SERVICES.query(service="app-service", query=request)
+        }
+        ''' % (app)
+        response = SERVICES.query(service="app-service", query=request)
 
-            # get results
-            response = response["uninstall"]
-            success = response["success"]
-            errors = response["errors"]
+        # get results
+        response = response["uninstall"]
+        success = response["success"]
+        errors = response["errors"]
 
-            if success:
-                logger.info("Deregistered app: {}".format(app))
+        if success:
+            logger.info("Deregistered app: {}".format(app))
+        else:
+            # check if error is due to no app existing in registry
+            if ("not found" in errors):
+                logger.info("No app named: {} found in registry.".format(app))
             else:
-                # check if error is due to no app existing in registry
-                if ("not found" in errors):
-                    logger.info("No app named: {} found in registry.".format(app))
-                else:
-                    logger.warning("Unable to deregister app {}: {}".format(app, errors))
+                logger.warning("Unable to deregister app {}: {}".format(app, errors))
 
     print("\n")
     ################## REGISTER APPLICATIONS WITH APPLICATIONS SERVICE #######################
-    for mode, settings in modes.items():
-        for app, path in settings['apps'].items():
+    for app, path in apps.items():
 
-            request = ''' mutation { register(path: "%s") { success, errors, entry { active, app { name, version } } } } ''' % (path)
-            response = SERVICES.query(service="app-service", query=request)
+        request = ''' mutation { register(path: "%s") { success, errors, entry { active, app { name, version } } } } ''' % (path)
+        response = SERVICES.query(service="app-service", query=request)
 
-            # get results
-            response = response["register"]
-            success = response["success"]
-            errors = response["errors"]
+        # get results
+        response = response["register"]
+        success = response["success"]
+        errors = response["errors"]
 
-            if success:
-                entry = response["entry"]
-                active = entry["active"]
-                app = entry["app"]
-                name = app["name"]
-                version = app["version"]
+        if success:
+            entry = response["entry"]
+            active = entry["active"]
+            app = entry["app"]
+            name = app["name"]
+            version = app["version"]
 
-                logger.info("Registered app name: {} path: {} version: {} active: {}.".format(name, path, version, active))
+            logger.info("Registered app name: {} path: {} version: {} active: {}.".format(name, path, version, active))
+        else:
+            # check if error is due to app already existing in registry
+            if ("exists" in errors):
+                logger.info("Already a registered app named: {}.".format(app))
             else:
-                # check if error is due to app already existing in registry
-                if ("exists" in errors):
-                    logger.info("Already a registered app named: {}.".format(app))
-                else:
-                    logger.warning("Could not register app {} at path {}: {}".format(app, path, errors))
+                logger.warning("Could not register app {} at path {}: {}".format(app, path, errors))
 
     print("\n")
-    ################# REMOVE REGISTERED APPS FROM SPECIFIC MISSION MODES #####################
-    #for mode, settings in modes.items():
-    #    
-    #    # add safe mode tasks/mission apps to safe mode
-    #    path = settings['path']
-    #    name = settings['name']
-    #    mode = settings['mode']
-    #    
-    #    # send mutation to remove task list from mode in scheduler
-    #    request = '''
-    #    mutation {
-    #        removeTaskList(name: "%s", mode: "%s") {
-    #            success
-    #            errors
-    #        }
-    #    }
-    #    ''' % (name, mode)
-    #    response = SERVICES.query(service="scheduler-service", query=request)
-    #
-    #    # get results
-    #    response = response["removeTaskList"]
-    #    success = response["success"]
-    #    errors = response["errors"]
-    #
-    #    if success:
-    #        logger.info("Removed task list {} from mode {}.".format(name, mode))
-    #    else:
-    #        logger.warning("Could not remove task list {} from mode {}: {}.".format(name, mode, errors))
-    #
-    #print("\n")
     ################# INSTALL REGISTERED APPS INTO SPECIFIC MISSION MODES #####################
     for mode, settings in modes.items():
         

@@ -16,7 +16,7 @@ class ADCS:
         # telemetry defaults
         self._power = 0  # (OFF=0,ON=1,RESET=2)
         self._mode = 0   # (IDLE=0,DETUMBLE=1,POINTING=2)
-        self._orientation = [1.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+        self._orientation = [1.0, 1.0, 1.0, 1.0]
         self._spin = [1.0, 1.0, 1.0]
 
         # ADCS initialize stuff here
@@ -78,29 +78,100 @@ class ADCS:
         finally: 
             return success, errors
 
-    def setMode(self, setModeInput):
+    def setModePointing(self, pointingInput):
         success = False
         errors = []
         try:
-            self.logger.info("Sending new mode to ADCS...")
-            mode=setModeInput.mode
+            self.logger.info("Pointing ADCS...")
+
+            # set mode to Pointing-  wouldn't need this if connected to real ADCS subsystem
+            self._mode = 2  # pointing
+            
+            a=pointingInput.a
+            b=pointingInput.b
+            c=pointingInput.c
+            d=pointingInput.d
             ####################################################################
-            # TODO: Set mode state (IDLE=1,DETUMBLE=0,POINTING=2) from ADCS here
+            # TODO: Perform pointing of ADCS here
+            self._orientation[0] = a
+            self._orientation[1] = b
+            self._orientation[2] = c
+            self._orientation[3] = d
             ####################################################################
             success = True
             errors = []
-            self._mode = mode
+
+            # set mode to IDLE once done - wouldn't need this if connected to real ADCS subsystem
+            self._mode = 1 # idle
 
             if success:
-                self.logger.info("Set ADCS mode={}".format(mode))
+                self.logger.info("Set ADCS pointing to orienation=({},{},{},{})".format(a,b,c,d))
             else:
-                self.logger.error("Unable to set ADCS mode={}".format(mode))
+                self.logger.error("Unable to point ADCS: {}".format(errors))
         
         except Exception as e:
-            self.logger.error("Exception trying to set ADCS mode={} : {}".format(mode, str(e)))
+            self.logger.error("Exception trying to pointing ADCS: {}".format(str(e)))
             success = False
             errors = [str(e)]
         
         finally: 
             return success, errors
 
+    def setModeDetumble(self):
+        success = False
+        errors = []
+        try:
+            self.logger.info("Commanding ADCS to detumble...")
+
+            # set mode to detumble -  wouldn't need this if connected to real ADCS subsystem
+            self._mode = 0 # detumble
+            
+            ####################################################################
+            # TODO: Perform detumble of ADCS here
+            ####################################################################
+            success = True
+            errors = []
+
+            # set mode to IDLE once done
+            self._mode = 1 # idle
+
+            if success:
+                self.logger.info("Set ADCS to detumble")
+            else:
+                self.logger.error("Unable to set ADCS to detumble")
+        
+        except Exception as e:
+            self.logger.error("Exception trying to set ADCS to detumble: {}".format(str(e)))
+            success = False
+            errors = [str(e)]
+        
+        finally: 
+            return success, errors
+
+    def setModeIdle(self):
+        success = False
+        errors = []
+        try:
+            self.logger.info("Commanding ADCS to idle...")
+
+            # set mode to idle -  wouldn't need this if connected to real ADCS subsystem
+            self._mode = 1 # idle
+            
+            ####################################################################
+            # TODO: Set ADCS idle here
+            ####################################################################
+            success = True
+            errors = []
+
+            if success:
+                self.logger.info("Set ADCS to idle")
+            else:
+                self.logger.error("Unable to set ADCS to idle")
+        
+        except Exception as e:
+            self.logger.error("Exception trying to set ADCS to idle: {}".format(str(e)))
+            success = False
+            errors = [str(e)]
+        
+        finally: 
+            return success, errors

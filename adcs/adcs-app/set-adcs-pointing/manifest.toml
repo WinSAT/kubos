@@ -1,0 +1,4 @@
+name = "set-adcs-pointing"
+executable = "set-adcs-pointing.py"
+version = "1.0"
+author = "Jon Grebe"

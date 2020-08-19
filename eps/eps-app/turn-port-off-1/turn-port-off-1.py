@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-Mission application that get the current orientation from ADCS module.
+Mission application that turns off a output port 1 on EPS module.
 """
 
 __author__ = "Jon Grebe"
@@ -14,7 +14,7 @@ import sys
 
 def main():
 
-    logger = app_api.logging_setup("get-adcs-orientation")
+    logger = app_api.logging_setup("turn-port-off-1")
 
     # parse arguments for config file and run type
     parser = argparse.ArgumentParser()
@@ -46,18 +46,29 @@ def on_boot(logger, SERVICES):
 def on_command(logger, SERVICES):
     
     # send mutation to turn off EPS port
-    request = ''' query { orientation { a b c d } } '''
-    response = SERVICES.query(service="adcs-service", query=request)
+    request = '''
+    mutation {
+        controlPort(controlPortInput: {
+                    power: OFF
+                    port: PORT1 })
+        {
+        errors
+        success
+        }
+    }
+    '''
+    response = SERVICES.query(service="eps-service", query=request)
 
     # get results
-    result = response["orientation"]
+    result = response["controlPort"]
+    success = result["success"]
+    errors = result["errors"]
 
-    a = result['a']
-    b = result['b']
-    c = result['c']
-    d = result['d']
-
-    logger.info("Current orientation ({}, {}, {}, {})".format(a, b, c, d))
+    # check results
+    if success:
+        logger.info("Turned off port 1.")
+    else:
+        logger.warn("Uable to turn off port 1: {}.".format(errors))
 
 if __name__ == "__main__":
     main()
