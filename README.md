@@ -7,7 +7,7 @@ The flight software utilizes the KubOS satellite software framework. [KubOS](htt
 
 ## Overview
 
-<img src="/images/arch.png" width="450"/> <img src="/images/software.png" width="450"/>
+<img src="/images/arch.png" width="400"/> <img src="/images/software.png" width="400"/>
 
 The flight software runs on the main Onboard Computer (OBC) and interfaces will all of other major subsystems onboard the satellite:
 
